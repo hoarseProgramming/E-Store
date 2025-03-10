@@ -1,6 +1,6 @@
 ﻿namespace EStore.Contracts.Requests;
 
-public class CreateProductRequest
+public class UpdateProductRequest
 {
     public required int ProductNumber { get; init; }
     public required string ProductName { get; init; }
