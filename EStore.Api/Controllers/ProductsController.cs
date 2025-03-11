@@ -1,22 +1,28 @@
 ﻿using EStore.Api.Mapping;
 using EStore.Api.Repositories;
+using EStore.Api.Services;
 using EStore.Contracts.Requests;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EStore.Api.Controllers;
 
 [ApiController]
-public class ProductsController(IProductRepository productRepository) : ControllerBase
+public class ProductsController(IProductService productService) : ControllerBase
 {
-    private readonly IProductRepository _productRepository = productRepository;
+    private readonly IProductService _productService = productService;
 
     [HttpPost(ApiEndpoints.Products.Create)]
     public async Task<IActionResult> Create([FromBody]CreateProductRequest request)
     {
         var product = request.MapToProduct();
 
-        await _productRepository.CreateAsync(product);
+        var created = await _productService.CreateAsync(product);
 
+        if (!created)
+        {
+            return BadRequest();
+        }
+        
         var response = product.MapToResponse();
 
         return CreatedAtAction(nameof(Get), new { productNumber = product.ProductNumber }, response);
@@ -25,7 +31,7 @@ public class ProductsController(IProductRepository productRepository) : Controll
     [HttpGet(ApiEndpoints.Products.Get)]
     public async Task<IActionResult> Get([FromRoute] int productNumber)
     {
-        var product = await _productRepository.GetByProductNumberAsync(productNumber);
+        var product = await _productService.GetByProductNumberAsync(productNumber);
 
         if (product is null)
         {
@@ -40,7 +46,7 @@ public class ProductsController(IProductRepository productRepository) : Controll
     [HttpGet(ApiEndpoints.Products.GetAll)]
     public async Task<IActionResult> GetAll()
     {
-        var products = await _productRepository.GetAllAsync();
+        var products = await _productService.GetAllAsync();
 
         var response = products.MapToResponse();
 
@@ -53,14 +59,13 @@ public class ProductsController(IProductRepository productRepository) : Controll
     {
         var product = request.MapToProduct(productNumber);
 
-        var updated = await _productRepository.UpdateAsync(product);
+        var updated = await _productService.UpdateAsync(product);
 
         if (!updated)
         {
             return NotFound();
         }
 
-        Console.WriteLine("");
         var response = product.MapToResponse();
 
         return Ok(response);
@@ -69,7 +74,7 @@ public class ProductsController(IProductRepository productRepository) : Controll
     [HttpDelete(ApiEndpoints.Products.Delete)]
     public async Task<IActionResult> Delete([FromRoute] int productNumber)
     {
-        var deleted = await _productRepository.DeleteByProductNumberAsync(productNumber);
+        var deleted = await _productService.DeleteByProductNumberAsync(productNumber);
 
         if (!deleted)
         {

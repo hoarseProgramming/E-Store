@@ -40,13 +40,6 @@ public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
 
     public async Task<bool> UpdateAsync(Product product)
     {
-        var productExists = await eStoreContext.Products.AnyAsync(p => p.ProductNumber == product.ProductNumber);
-
-        if (!productExists)
-        {
-            return false;
-        }
-        
         eStoreContext.Update(product);
         
         var result = await eStoreContext.SaveChangesAsync();
@@ -58,15 +51,17 @@ public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
     {
         var product = await eStoreContext.Products.SingleOrDefaultAsync(p => p.ProductNumber == productNumber);
 
-        if (product is null)
-        {
-            return false;
-        }
-
         eStoreContext.Remove(product);
 
-        await eStoreContext.SaveChangesAsync();
+        var result = await eStoreContext.SaveChangesAsync();
 
-        return true;
+        return result > 0;
+    }
+
+    public async Task<bool> ExistsByProductNumberAsync(int productNumber)
+    {
+        var productExists = await eStoreContext.Products.AnyAsync(p => p.ProductNumber == productNumber);
+
+        return productExists;
     }
 }

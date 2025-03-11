@@ -34,13 +34,6 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
 
     public async Task<bool> UpdateAsync(Customer customer)
     {
-        var customerExists = await eStoreContext.Customers.AnyAsync(c => c.Id == customer.Id);
-
-        if (!customerExists)
-        {
-            return false;
-        }
-        
         eStoreContext.Update(customer);
 
         var result = await eStoreContext.SaveChangesAsync();
@@ -51,15 +44,17 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         var customer = await eStoreContext.Customers.SingleOrDefaultAsync(c => c.Id == id);
-
-        if (customer is null)
-        {
-            return false;
-        }
         
         eStoreContext.Remove(customer);
 
-        await eStoreContext.SaveChangesAsync();
-        return true;
+        var result = await eStoreContext.SaveChangesAsync();
+        return result > 0;
+    }
+
+    public async Task<bool> ExistsByIdAsync(Guid id)
+    {
+        bool customerExists = await eStoreContext.Customers.AnyAsync(c => c.Id == id);
+
+        return customerExists;
     }
 }

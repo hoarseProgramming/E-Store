@@ -1,5 +1,5 @@
 ﻿using EStore.Api.Mapping;
-using EStore.Api.Repositories;
+using EStore.Api.Services;
 using EStore.Contracts.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,16 +7,16 @@ namespace EStore.Api.Controllers;
 
 
 [ApiController]
-public class CustomersController(ICustomerRepository customerRepository) : ControllerBase
+public class CustomersController(ICustomerService customerService) : ControllerBase
 {
-    private readonly ICustomerRepository _customerRepository = customerRepository;
+    private readonly ICustomerService _customerService = customerService;
 
     [HttpPost(ApiEndpoints.Customers.Create)]
     public async Task<IActionResult> Create([FromBody]CreateCustomerRequest request)
     {
         var customer = request.MapToCustomer();
 
-        await _customerRepository.CreateAsync(customer);
+        await _customerService.CreateAsync(customer);
 
         var response = customer.MapToResponse();
 
@@ -26,7 +26,7 @@ public class CustomersController(ICustomerRepository customerRepository) : Contr
     [HttpGet(ApiEndpoints.Customers.Get)]
     public async Task<IActionResult> Get([FromRoute]Guid id)
     {
-        var customer = await _customerRepository.GetByIdAsync(id);
+        var customer = await _customerService.GetByIdAsync(id);
         
         if (customer is null)
         {
@@ -41,7 +41,7 @@ public class CustomersController(ICustomerRepository customerRepository) : Contr
     [HttpGet(ApiEndpoints.Customers.GetAll)]
     public async Task<IActionResult> GetAll()
     {
-        var customers = await _customerRepository.GetAllAsync();
+        var customers = await _customerService.GetAllAsync();
     
         var response = customers.MapToResponse();
     
@@ -54,9 +54,9 @@ public class CustomersController(ICustomerRepository customerRepository) : Contr
     {
         var customer = request.MapToCustomer(id);
     
-        var updated = await _customerRepository.UpdateAsync(customer);
+        var updatedCustomer = await _customerService.UpdateAsync(customer);
     
-        if (!updated)
+        if (updatedCustomer is null)
         {
             return NotFound();
         }
@@ -69,7 +69,7 @@ public class CustomersController(ICustomerRepository customerRepository) : Contr
     [HttpDelete(ApiEndpoints.Customers.Delete)]
     public async Task<IActionResult> Delete([FromRoute]Guid id)
     {
-        var deleted = await _customerRepository.DeleteByIdAsync(id);
+        var deleted = await _customerService.DeleteByIdAsync(id);
     
         if (!deleted)
         {

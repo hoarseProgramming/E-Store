@@ -102,4 +102,27 @@ public static class ContractMapping
             Country = request.Country
         };
     }
+
+    public static Category MapToCategory(this CreateCategoryRequest request)
+    {
+        return new Category()
+        {
+            Id = Guid.NewGuid(),
+            CategoryName = request.CategoryName
+        };
+    }
+
+    public static CategoryResponse MapToResponse(this Category category)
+    {
+        return new CategoryResponse()
+        {
+            Id = category.Id,
+            CategoryName = category.CategoryName
+        };
+    }
+
+    public static IEnumerable<CategoryResponse> MapToResponse(this IEnumerable<Category> categories)
+    {
+        return categories.Select(MapToResponse);
+    }
 }
