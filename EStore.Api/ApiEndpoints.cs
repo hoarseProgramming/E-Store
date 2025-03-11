@@ -33,4 +33,17 @@ public static class ApiEndpoints
         
         public const string Delete = $"{Base}/{{id:Guid}}";
     }
+    
+    public static class Categories
+    {
+        private const string Base = $"{ApiBase}/categories";
+
+        public const string Create = Base;
+
+        public const string Get = $"{Base}/{{id:Guid}}";
+
+        public const string GetAll = Base;
+        
+        public const string Delete = $"{Base}/{{id:Guid}}";
+    }
 }

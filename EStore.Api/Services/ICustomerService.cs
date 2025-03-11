@@ -1,14 +1,13 @@
 ﻿using EStore.Api.Models;
 
-namespace EStore.Api.Repositories;
+namespace EStore.Api.Services;
 
-public interface ICustomerRepository
+public interface ICustomerService
 {
     Task<bool> CreateAsync(Customer customer);
     Task<Customer?> GetByIdAsync(Guid id);
     Task<Customer?> GetByEmailAsync(string email);
     Task<IEnumerable<Customer>> GetAllAsync();
-    Task<bool> UpdateAsync(Customer customer);
+    Task<Customer?> UpdateAsync(Customer customer);
     Task<bool> DeleteByIdAsync(Guid id);
-    Task<bool> ExistsByIdAsync(Guid id);
 }
