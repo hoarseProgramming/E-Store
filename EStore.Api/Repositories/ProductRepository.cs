@@ -7,28 +7,14 @@ namespace EStore.Api.Repositories;
 public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
 {
     
-    public async Task<bool> CreateAsync(Product product)
+    public void Create(Product product)
     {
         eStoreContext.Products.Add(product);
-        
-        await eStoreContext.Database.OpenConnectionAsync();
-        try
-        {
-            await eStoreContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Products ON");
-            await eStoreContext.SaveChangesAsync();
-            await eStoreContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Products OFF");
-        }
-        finally
-        {
-            await eStoreContext.Database.CloseConnectionAsync();
-        }
-        
-        return true;
     }
 
     public async Task<Product?> GetByProductNumberAsync(int productNumber)
     {
-        var product = eStoreContext.Products.SingleOrDefault(p => p.ProductNumber == productNumber);
+        var product = await eStoreContext.Products.SingleOrDefaultAsync(p => p.ProductNumber == productNumber);
 
         return product;
     }
@@ -38,24 +24,16 @@ public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
         return await eStoreContext.Products.ToListAsync();
     }
 
-    public async Task<bool> UpdateAsync(Product product)
+    public void Update(Product product)
     {
         eStoreContext.Update(product);
-        
-        var result = await eStoreContext.SaveChangesAsync();
-
-        return result > 0;
     }
 
-    public async Task<bool> DeleteByProductNumberAsync(int productNumber)
+    public async Task DeleteByProductNumberAsync(int productNumber)
     {
         var product = await eStoreContext.Products.SingleOrDefaultAsync(p => p.ProductNumber == productNumber);
 
         eStoreContext.Remove(product);
-
-        var result = await eStoreContext.SaveChangesAsync();
-
-        return result > 0;
     }
 
     public async Task<bool> ExistsByProductNumberAsync(int productNumber)

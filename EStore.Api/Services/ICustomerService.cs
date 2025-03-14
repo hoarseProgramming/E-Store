@@ -8,6 +8,6 @@ public interface ICustomerService
     Task<Customer?> GetByIdAsync(Guid id);
     Task<Customer?> GetByEmailAsync(string email);
     Task<IEnumerable<Customer>> GetAllAsync();
-    Task<Customer?> UpdateAsync(Customer customer);
+    Task<bool> UpdateAsync(Customer customer);
     Task<bool> DeleteByIdAsync(Guid id);
 }

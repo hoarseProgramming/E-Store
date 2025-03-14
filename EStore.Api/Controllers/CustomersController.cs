@@ -54,9 +54,9 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     {
         var customer = request.MapToCustomer(id);
     
-        var updatedCustomer = await _customerService.UpdateAsync(customer);
+        var updated = await _customerService.UpdateAsync(customer);
     
-        if (updatedCustomer is null)
+        if (!updated)
         {
             return NotFound();
         }
