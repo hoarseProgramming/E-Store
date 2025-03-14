@@ -19,6 +19,8 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(
             .HasForeignKey(e => e.CategoryId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
+        
+        
 
     }
 }
