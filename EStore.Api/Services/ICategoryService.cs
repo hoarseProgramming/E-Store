@@ -1,4 +1,5 @@
 ﻿using EStore.Api.Models;
+using EStore.Api.UnitOfWork;
 
 namespace EStore.Api.Services;
 

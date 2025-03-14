@@ -4,11 +4,11 @@ namespace EStore.Api.Repositories;
 
 public interface ICustomerRepository
 {
-    Task<bool> CreateAsync(Customer customer);
+    void Create(Customer customer);
     Task<Customer?> GetByIdAsync(Guid id);
     Task<Customer?> GetByEmailAsync(string email);
     Task<IEnumerable<Customer>> GetAllAsync();
-    Task<bool> UpdateAsync(Customer customer);
-    Task<bool> DeleteByIdAsync(Guid id);
+    void Update(Customer customer);
+    Task DeleteByIdAsync(Guid id);
     Task<bool> ExistsByIdAsync(Guid id);
 }

@@ -16,7 +16,9 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(
         modelBuilder.Entity<Product>()
             .HasOne<Category>()
             .WithMany()
-            .HasForeignKey(e => e.CategoryId);
+            .HasForeignKey(e => e.CategoryId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
 
     }
 }

@@ -8,13 +8,9 @@ public class CategoryRepository(EStoreContext eStoreContext) : ICategoryReposito
 {
     private readonly EStoreContext _eStoreContext = eStoreContext;
     
-    public async Task<bool> CreateAsync(Category category)
+    public void Create(Category category)
     {
         _eStoreContext.Categories.Add(category);
-
-        var result = await _eStoreContext.SaveChangesAsync();
-
-        return result > 0;
     }
 
     public async Task<Category?> GetByIdAsync(Guid id)
@@ -29,15 +25,23 @@ public class CategoryRepository(EStoreContext eStoreContext) : ICategoryReposito
         return await _eStoreContext.Categories.ToListAsync();
     }
 
-    public async Task<bool> DeleteAsync(Guid id)
+    //TODO: Remove this method
+    // public async Task<bool> DeleteAsync(Guid id)
+    // {
+    //     var category = await _eStoreContext.Categories.SingleOrDefaultAsync(c => c.Id == id);
+    //
+    //     _eStoreContext.Remove(category);
+    //
+    //     var result = await _eStoreContext.SaveChangesAsync();
+    //
+    //     return result > 0;
+    // }
+    
+    public async Task DeleteAsync(Guid id)
     {
         var category = await _eStoreContext.Categories.SingleOrDefaultAsync(c => c.Id == id);
 
         _eStoreContext.Remove(category);
-
-        var result = await _eStoreContext.SaveChangesAsync();
-
-        return result > 0;
     }
 
     public async Task<bool> ExistsByIdAsync(Guid id)

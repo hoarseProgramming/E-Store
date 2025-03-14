@@ -1,45 +1,52 @@
 ﻿using EStore.Api.Models;
 using EStore.Api.Repositories;
+using EStore.Api.UnitOfWork;
 
 namespace EStore.Api.Services;
 
-public class CategoryService(ICategoryRepository categoryRepository) : ICategoryService
+public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
 {
-    private readonly ICategoryRepository _categoryRepository = categoryRepository;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
     
     public async Task<bool> CreateAsync(Category category)
     {
-        var nameIsTaken = await _categoryRepository.ExistsByCategoryNameAsync(category.CategoryName);
+        var nameIsTaken = await _unitOfWork.CategoryRepository.ExistsByCategoryNameAsync(category.CategoryName);
         
         if (nameIsTaken)
         {
             return false;
         }
         
-        var created = await _categoryRepository.CreateAsync(category);
+        _unitOfWork.CategoryRepository.Create(category);
 
-        return created;
+        var result = await _unitOfWork.SaveChangesAsync();
+
+        return result > 0;
     }
 
     public async Task<Category?> GetByIdAsync(Guid id)
     {
-        return await _categoryRepository.GetByIdAsync(id);
+        return await _unitOfWork.CategoryRepository.GetByIdAsync(id);
     }
 
     public async Task<IEnumerable<Category>> GetAllAsync()
     {
-        return await _categoryRepository.GetAllAsync();
+        return await _unitOfWork.CategoryRepository.GetAllAsync();
     }
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var categoryExists = await _categoryRepository.ExistsByIdAsync(id);
+        var categoryExists = await _unitOfWork.CategoryRepository.ExistsByIdAsync(id);
 
         if (!categoryExists)
         {
             return false;
         }
         
-        return await _categoryRepository.DeleteAsync(id);
+        await _unitOfWork.CategoryRepository.DeleteAsync(id);
+        
+        var result = await _unitOfWork.SaveChangesAsync();
+
+        return result > 0;
     }
 }

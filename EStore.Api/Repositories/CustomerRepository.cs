@@ -6,13 +6,9 @@ namespace EStore.Api.Repositories;
 
 public class CustomerRepository(EStoreContext eStoreContext) : ICustomerRepository
 {
-    public async Task<bool> CreateAsync(Customer customer)
+    public void Create(Customer customer)
     {
         eStoreContext.Customers.Add(customer);
-
-        await eStoreContext.SaveChangesAsync();
-        
-        return true;
     }
 
     public async Task<Customer?> GetByIdAsync(Guid id)
@@ -32,23 +28,16 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
         return await eStoreContext.Customers.ToListAsync();
     }
 
-    public async Task<bool> UpdateAsync(Customer customer)
+    public void Update(Customer customer)
     {
         eStoreContext.Update(customer);
-
-        var result = await eStoreContext.SaveChangesAsync();
-
-        return result > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(Guid id)
+    public async Task DeleteByIdAsync(Guid id)
     {
         var customer = await eStoreContext.Customers.SingleOrDefaultAsync(c => c.Id == id);
         
         eStoreContext.Remove(customer);
-
-        var result = await eStoreContext.SaveChangesAsync();
-        return result > 0;
     }
 
     public async Task<bool> ExistsByIdAsync(Guid id)
