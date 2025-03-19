@@ -125,4 +125,64 @@ public static class ContractMapping
     {
         return categories.Select(MapToResponse);
     }
+
+    public static Order MapToOrder(this CreateOrderRequest request)
+    {
+        var newId = Guid.NewGuid();
+        
+        return new Order()
+        {
+            Id = newId,
+            CustomerId = request.CustomerId,
+            OrderProducts = request.OrderProducts.MapToOrderProducts(newId).ToList()
+        };
+    }
+
+    public static OrderResponse MapToResponse(this Order order)
+    {
+        return new OrderResponse()
+        {
+            Id = order.Id,
+            CustomerId = order.CustomerId,
+            Products = order.OrderProducts.MapToResponse()
+        };
+    }
+
+    public static OrdersResponse MapToResponse(this IEnumerable<Order> orders)
+    {
+        return new OrdersResponse()
+        {
+            Orders = orders.Select(MapToResponse)
+        };
+    }
+
+    public static OrderProduct MapToOrderProduct(CreateOrderProductRequest request, Guid orderId)
+    {
+        return new OrderProduct()
+        {
+            OrderId = orderId,
+            ProductNumber = request.ProductNumber,
+            Quantity = request.Quantity
+        };
+    }
+
+    public static IEnumerable<OrderProduct> MapToOrderProducts(this IEnumerable<CreateOrderProductRequest> requests,
+        Guid orderId)
+    {
+        return requests.Select(request => MapToOrderProduct(request, orderId));
+    }
+
+    public static OrderProductResponse MapToResponse(this OrderProduct orderProduct)
+    {
+        return new OrderProductResponse()
+        {
+            ProductNumber = orderProduct.ProductNumber,
+            Quantity = orderProduct.Quantity
+        };
+    }
+
+    public static IEnumerable<OrderProductResponse> MapToResponse(this List<OrderProduct> orderProducts)
+    {
+        return orderProducts.Select(MapToResponse);
+    }
 }

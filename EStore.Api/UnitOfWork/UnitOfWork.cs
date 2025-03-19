@@ -2,6 +2,7 @@
 using EStore.Api.Repositories;
 using EStore.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace EStore.Api.UnitOfWork;
 
@@ -21,6 +22,8 @@ public class UnitOfWork : IUnitOfWork
     public ICategoryRepository CategoryRepository => _serviceProvider.GetService<ICategoryRepository>();
     public ICustomerRepository CustomerRepository => _serviceProvider.GetService<ICustomerRepository>();
     public IProductRepository ProductRepository => _serviceProvider.GetService<IProductRepository>();
+    public IOrderRepository OrderRepository => _serviceProvider.GetService<IOrderRepository>();
+    public IOrderProductRepository OrderProductRepository => _serviceProvider.GetService<IOrderProductRepository>();
 
     public async Task<int> SaveChangesAsync()
     {
