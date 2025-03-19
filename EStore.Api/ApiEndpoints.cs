@@ -46,4 +46,17 @@ public static class ApiEndpoints
         
         public const string Delete = $"{Base}/{{id:Guid}}";
     }
+
+    public static class Orders
+    {
+        private const string Base = $"{ApiBase}/orders";
+
+        public const string Create = Base;
+
+        public const string Get = $"{Base}/{{id:Guid}}";
+
+        public const string GetAll = Base;
+
+        public const string Delete = $"{Base}/{{id:Guid}}";
+    }
 }

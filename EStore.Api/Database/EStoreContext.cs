@@ -8,6 +8,11 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<OrderProduct> OrderProducts { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Product>()
@@ -16,9 +21,51 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(
         modelBuilder.Entity<Product>()
             .HasOne<Category>()
             .WithMany()
-            .HasForeignKey(e => e.CategoryId)
+            .HasForeignKey(c => c.CategoryId);
+        
+        // modelBuilder.Entity<Product>()
+        //     .HasMany(p => p.Orders)
+        //     .WithMany(o => o.Products)
+        //     .UsingEntity<OrderProduct>();
+        
+        modelBuilder.Entity<Product>()
+            .HasOne<Category>()
+            .WithMany()
+            .HasForeignKey(c => c.CategoryId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Order>()
+            .HasOne<Customer>()
+            .WithMany()
+            .HasForeignKey(c => c.CustomerId);
+        
+        // modelBuilder.Entity<Order>()
+        //     .HasMany(o => o.Products)
+        //     .WithMany(p => p.Orders)
+        //     .UsingEntity<OrderProduct>(op => op.HasOne<Order>().WithMany(e => e.OrderProducts));
+        
+        // modelBuilder.Entity<Order>()
+        //     .HasMany(o => o.OrderProducts)
+        //     .WithOne()
+        //     .HasForeignKey(op => new { op.ProductNumber, op.OrderId });
+
+        modelBuilder.Entity<OrderProduct>()
+            .HasKey(op => new { op.ProductNumber, op.OrderId });
+
+        modelBuilder.Entity<OrderProduct>()
+            .HasOne<Order>()
+            .WithMany(o => o.OrderProducts)
+            .HasForeignKey(e => e.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<OrderProduct>()
+            .HasOne<Product>()
+            .WithMany()
+            .HasForeignKey(e => e.ProductNumber)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        
 
     }
 }
