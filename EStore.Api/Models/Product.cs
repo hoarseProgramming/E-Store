@@ -8,5 +8,4 @@ public class Product
     public required double Price { get; set; }
     public Guid? CategoryId { get; set; }
     public required bool IsInAssortment { get; set; }
-    // public List<Order> Orders { get; } = [];
 }
