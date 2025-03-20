@@ -57,13 +57,13 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(
             .HasOne<Order>()
             .WithMany(o => o.OrderProducts)
             .HasForeignKey(e => e.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
         
         modelBuilder.Entity<OrderProduct>()
             .HasOne<Product>()
             .WithMany()
             .HasForeignKey(e => e.ProductNumber)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         
 
