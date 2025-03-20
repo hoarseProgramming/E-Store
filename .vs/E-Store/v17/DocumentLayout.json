@@ -1,0 +1,45 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\hampu\\Programmering\\ITHS\\Kurser\\Kurs 3 - Webbutveckling med .NET\\Labbar\\E-Store\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{526060E5-CC69-4B6E-8692-7298FA526AFF}|EStore.Application\\EStore.Application.csproj|c:\\users\\hampu\\programmering\\iths\\kurser\\kurs 3 - webbutveckling med .net\\labbar\\e-store\\estore.application\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{526060E5-CC69-4B6E-8692-7298FA526AFF}|EStore.Application\\EStore.Application.csproj|solutionrelative:estore.application\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\hampu\\Programmering\\ITHS\\Kurser\\Kurs 3 - Webbutveckling med .NET\\Labbar\\E-Store\\EStore.Application\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "EStore.Application\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\hampu\\Programmering\\ITHS\\Kurser\\Kurs 3 - Webbutveckling med .NET\\Labbar\\E-Store\\EStore.Application\\Properties\\launchSettings.json",
+              "RelativeToolTip": "EStore.Application\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-03-20T10:33:20.561Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
