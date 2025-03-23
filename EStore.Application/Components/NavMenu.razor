@@ -1,0 +1,8 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+    <MudNavLink Href="/store" Match="NavLinkMatch.Prefix">Store</MudNavLink>
+    <MudNavLink Href="/account" Match="NavLinkMatch.Prefix">Account</MudNavLink>
+    <AuthorizeVisible AllowedRole="ADMIN">
+        <MudNavLink Href="/admin" Match="NavLinkMatch.Prefix">Admin</MudNavLink>
+    </AuthorizeVisible>
+</MudNavMenu>

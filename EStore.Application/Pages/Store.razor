@@ -1,0 +1,32 @@
+﻿@page "/store"
+@using EStore.Contracts.Responses
+
+@inject IHttpClientFactory Factory;
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<ul>
+    @foreach (var product in Products)
+    {
+        <li>
+            <ProductComponent Product="product"></ProductComponent>
+        </li>
+    }
+</ul>
+
+@code {
+    private HttpClient _httpClient;
+
+    private List<ProductResponse> Products = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _httpClient = Factory.CreateClient("backend");
+
+        var productsResponse = await _httpClient.GetFromJsonAsync<ProductsResponse>("api/products");
+
+        Products = productsResponse.Products.ToList();
+
+
+        await base.OnInitializedAsync();
+    }
+}

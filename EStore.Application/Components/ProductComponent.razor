@@ -1,0 +1,11 @@
+﻿@using EStore.Contracts.Responses
+
+<h3>@Product.ProductName</h3>
+<h3>@Product.Price</h3>
+<MudButton Variant="Variant.Filled">Add to cart</MudButton>
+
+@code {
+	[Parameter]
+	public ProductResponse Product { get; set; }
+
+}
