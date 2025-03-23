@@ -1,9 +1,11 @@
 ﻿using EStore.Api.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EStore.Api.Database;
 
-public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(options)
+public class EStoreContext(DbContextOptions<EStoreContext> options) : IdentityDbContext(options)
 {
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
@@ -15,6 +17,8 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : DbContext(
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.Entity<Product>()
             .HasKey(product => product.ProductNumber);
         

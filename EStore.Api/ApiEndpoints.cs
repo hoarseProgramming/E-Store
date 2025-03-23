@@ -59,4 +59,11 @@ public static class ApiEndpoints
 
         public const string Delete = $"{Base}/{{id:Guid}}";
     }
+    
+    public static class Auth
+    {
+        public const string Get = $"{ApiBase}/roles";
+        public const string RegisterAdmin = $"{ApiBase}/register-admin";
+
+    }
 }
