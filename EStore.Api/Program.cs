@@ -2,6 +2,7 @@ using EStore.Api.Database;
 using EStore.Api.Repositories;
 using EStore.Api.Services;
 using EStore.Api.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +29,28 @@ builder.Services.AddScoped<IOrderProductRepository, OrderProductRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
+});
 
+builder.Services.AddIdentityCore<IdentityUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<EStoreContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddIdentityApiEndpoints<IdentityUser>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontendPolicy", policy =>
+    {
+        policy.WithOrigins("https://localhost:7189");
+        policy.AllowAnyMethod();
+        policy.AllowAnyHeader();
+        policy.AllowCredentials();
+    });
+});
 
 builder.Services.AddDbContext<EStoreContext>(options =>
 {
@@ -36,6 +58,8 @@ builder.Services.AddDbContext<EStoreContext>(options =>
 });
 
 var app = builder.Build();
+
+app.UseCors("frontendPolicy");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -46,7 +70,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGroup("/api")
+    .MapIdentityApi<IdentityUser>();
 
 app.MapControllers();
 

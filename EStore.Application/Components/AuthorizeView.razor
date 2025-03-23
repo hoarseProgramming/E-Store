@@ -1,0 +1,54 @@
+﻿@using EStore.Application.Events
+@using EStore.Application.Interfaces
+@inject IAuthenticationStateProvider StateProvider
+
+@if (_isAllowed)
+{
+    <div>
+        @ChildContent
+    </div>
+}
+else
+{
+    <p>404 not found</p>
+}
+
+@code {
+
+    private bool _isAllowed = false;
+    
+    [Parameter]
+    public string AllowedRole { get; set; } = "";
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AuthPublisher.AuthenticationStateChanged += async () => await UpdateState();
+
+        await CheckAllowed();
+        
+        await base.OnInitializedAsync();
+    }
+
+    private async Task UpdateState()
+    {
+        await CheckAllowed();
+    }
+
+    private async Task CheckAllowed()
+    {
+        _isAllowed = await StateProvider.IsAuthenticatedAsync();
+
+        var allowedRole = await StateProvider.GetRoleAsync();
+
+        if (AllowedRole != allowedRole)
+        {
+            _isAllowed = false;
+        }
+        
+        StateHasChanged();
+    }
+
+}

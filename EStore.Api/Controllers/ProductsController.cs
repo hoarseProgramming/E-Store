@@ -2,10 +2,12 @@
 using EStore.Api.Repositories;
 using EStore.Api.Services;
 using EStore.Contracts.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EStore.Api.Controllers;
 
+[Authorize]
 [ApiController]
 public class ProductsController(IProductService productService) : ControllerBase
 {
@@ -28,6 +30,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         return CreatedAtAction(nameof(Get), new { productNumber = product.ProductNumber }, response);
     }
 
+    [AllowAnonymous]
     [HttpGet(ApiEndpoints.Products.Get)]
     public async Task<IActionResult> Get([FromRoute] int productNumber)
     {
@@ -43,6 +46,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpGet(ApiEndpoints.Products.GetAll)]
     public async Task<IActionResult> GetAll()
     {
@@ -71,6 +75,7 @@ public class ProductsController(IProductService productService) : ControllerBase
         return Ok(response);
     }
 
+    [Authorize(Roles = "ADMIN")]
     [HttpDelete(ApiEndpoints.Products.Delete)]
     public async Task<IActionResult> Delete([FromRoute] int productNumber)
     {
