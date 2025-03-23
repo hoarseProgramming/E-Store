@@ -1,0 +1,83 @@
+﻿@page "/account"
+
+@using EStore.Application.Dtos
+@using EStore.Application.Events
+@using EStore.Contracts.Responses
+
+@inject IHttpClientFactory Factory;
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<PageTitle>Account</PageTitle>
+
+<form>
+    <input type="email" placeholder="Enter email" @bind="_email" />
+    <input type="password" placeholder="Enter password" @bind="_password" />
+    <button type="button" @onclick="RegisterAsync">Register</button>
+    <button type="button" @onclick="LoginAsync">Login</button>
+    <button type="button" @onclick="LogoutAsync">Log out</button>
+</form>
+
+<AuthorizeView AllowedRole="ADMIN">
+    <p>Inne</p>
+</AuthorizeView>
+
+<p>@_info</p>
+
+@code
+{
+    private HttpClient _httpClient;
+
+    private string _email = "";
+    private string _password = "";
+    private string _info = "";
+
+    private List<ProductResponse> _products = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _httpClient = Factory.CreateClient("backend");
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task RegisterAsync()
+    {
+        var result = await _httpClient.PostAsJsonAsync("api/register", new
+        {
+            email = _email,
+            password = _password
+        });
+
+        _info = result.IsSuccessStatusCode ? "Registration successful" : "Didn't work";
+    }
+    private async Task LoginAsync()
+    {
+        var result = await _httpClient.PostAsJsonAsync("api/login", new
+        {
+            email = _email,
+            password = _password
+        });
+
+        if (result.IsSuccessStatusCode)
+        {
+            var token = await result.Content.ReadFromJsonAsync<LoginResponse>();
+
+            if (token is not null)
+            {
+                await LocalStorage.SetItemAsync("eStoreToken", token.AccessToken);
+                _info = "Login successful";
+                await AuthPublisher.OnAuthenticationStateChanged();
+            }
+        }
+        else
+        {
+            _info = "Didn't work";
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        await LocalStorage.RemoveItemAsync("eStoreToken");
+        await AuthPublisher.OnAuthenticationStateChanged();
+    }
+}

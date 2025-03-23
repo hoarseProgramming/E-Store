@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Both",
+    "Projects": [
+      {
+        "Path": "EStore.Api\\EStore.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "EStore.Application\\EStore.Application.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      }
+    ]
+  }
+]
