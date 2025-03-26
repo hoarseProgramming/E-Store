@@ -1,4 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@inherits LayoutComponentBase
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -9,11 +14,17 @@
 
 <MudLayout>
     <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        Store
+        <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Inherit" Edge="Edge.Start" Href="/" />
+        <MudIconButton Icon="@Icons.Material.Filled.ShoppingBasket" Color="Color.Inherit" Edge="Edge.Start" Href="/store" />
+        <MudIconButton Icon="@Icons.Material.Filled.SupervisedUserCircle" Color="Color.Inherit" Edge="Edge.Start" Href="/account" />
+        <AuthorizeVisible AllowedRole="ADMIN">
+            <MudIconButton Icon="@Icons.Material.Filled.AdminPanelSettings" Color="Color.Inherit" Edge="Edge.Start" Href="/admin" />
+        </AuthorizeVisible>
+        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" Edge="Edge.End" OnClick="@((e) => DrawerToggle())" />
+
     </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
-        <NavMenu/>
+    <MudDrawer @bind-Open="@_drawerOpen" Anchor="Anchor.End">
+        <ShoppingCart/>
     </MudDrawer>
     <MudMainContent>
         @Body
@@ -27,4 +38,5 @@
     {
         _drawerOpen = !_drawerOpen;
     }
+
 }

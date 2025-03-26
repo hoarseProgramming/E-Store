@@ -1,22 +1,26 @@
 ﻿@page "/store"
+@using EStore.Application.ApplicationModels
+@using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
+@using EStore.Application.Mapping
 
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
-<ul>
+<MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Start">
     @foreach (var product in Products)
     {
-        <li>
-            <ProductComponent Product="product"></ProductComponent>
-        </li>
+        <ProductComponent Product="product"></ProductComponent>
     }
-</ul>
+</MudStack>
+
 
 @code {
     private HttpClient _httpClient;
 
-    private List<ProductResponse> Products = [];
+    private List<StoreProduct> Products = [];
+
+    private List<StoreProduct> _productsInCart = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,8 +28,15 @@
 
         var productsResponse = await _httpClient.GetFromJsonAsync<ProductsResponse>("api/products");
 
-        Products = productsResponse.Products.ToList();
 
+        if (productsResponse is not null)
+        {
+            Products = productsResponse.MapToStoreProducts().ToList();
+        }
+
+        var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+
+        // StateHasChanged();
 
         await base.OnInitializedAsync();
     }

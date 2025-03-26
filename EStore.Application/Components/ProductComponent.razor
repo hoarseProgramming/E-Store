@@ -1,11 +1,31 @@
-﻿@using EStore.Contracts.Responses
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Application.Events
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
-<h3>@Product.ProductName</h3>
-<h3>@Product.Price</h3>
-<MudButton Variant="Variant.Filled">Add to cart</MudButton>
+<MudStack>
+	<h3>@Product.ProductName</h3>
+	<h3>@Product.Price :-</h3>
+	<MudButton Variant="Variant.Filled" OnClick="AddToCart">Add to cart</MudButton>
+</MudStack>
 
 @code {
 	[Parameter]
-	public ProductResponse Product { get; set; }
+	public StoreProduct Product { get; set; }
 
+	public async Task AddToCart(){
+		var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+
+		if (localStorageCart.Any(p => p.ProductNumber == Product.ProductNumber))
+		{
+			return;
+		}
+
+		localStorageCart.Add(Product);
+
+		await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", localStorageCart);
+
+		await CartPublisher.OnCartStateChanged();
+	}
 }
