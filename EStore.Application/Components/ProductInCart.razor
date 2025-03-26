@@ -1,0 +1,59 @@
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Application.Events
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<MudItem Class="border-solid border-2 mud-border-primary mud-width-full">
+	<MudGrid>
+		<MudItem xs="12">
+			<MudPaper Class="d-flex align-center justify-center mud-width-full">@Product.ProductName</MudPaper>
+		</MudItem>
+		<MudItem xs="4">
+			<MudIconButton Class="d-flex align-center justify-center mud-width-full" Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" OnClick="@((e) => AddProduct())" />
+		</MudItem>
+		<MudItem xs="4">
+			<MudPaper Class="d-flex align-center justify-center mud-width-full">@Product.Quantity</MudPaper>
+		</MudItem>
+		<MudItem xs="4">
+			<MudIconButton Class="d-flex align-center justify-center mud-width-full" Icon="@Icons.Material.Filled.Remove" Color="Color.Inherit" OnClick="@((e) => RemoveProduct())" />
+		</MudItem>
+	</MudGrid>
+</MudItem>
+
+@code {
+	[Parameter]
+	public StoreProduct Product { get; set; }
+
+	public async Task AddProduct()
+	{
+		var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+
+		var product = localStorageCart.SingleOrDefault(p => p.ProductNumber == Product.ProductNumber);
+
+		product.Quantity = product.Quantity + 1;
+
+		await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", localStorageCart);
+
+		await CartPublisher.OnCartStateChanged();
+	}
+
+	public async Task RemoveProduct()
+	{
+		var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+
+		var product = localStorageCart.SingleOrDefault(p => p.ProductNumber == Product.ProductNumber);
+
+		if (product.Quantity > 1)
+		{
+			product.Quantity = product.Quantity - 1;
+
+		}
+		else
+		{
+			localStorageCart.Remove(product);
+		}
+
+		await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", localStorageCart);
+
+		await CartPublisher.OnCartStateChanged();
+	}
+}

@@ -1,0 +1,58 @@
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Application.Events
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<MudPaper Height="100%" Width="100%">
+	<MudPaper Height="90%" Width="100%">
+		<MudStack Spacing="0">
+			<MudPaper Class="d-flex justify-center align-center mud-width-full pa-2">
+				ShoppingCart
+			</MudPaper>
+			@foreach (var product in Products)
+			{
+				<ProductInCart Product="product"></ProductInCart>
+			}
+		</MudStack>
+		<MudPaper></MudPaper>
+	</MudPaper>
+	<MudPaper Height="10%" Class="d-flex justify-center align-center">
+		<MudButton>Add to cart</MudButton>
+	</MudPaper>
+</MudPaper>
+
+
+
+
+
+
+
+@code {
+	public List<StoreProduct> Products { get; set; } = [];
+
+	protected override async Task OnInitializedAsync()
+	{
+		CartPublisher.CartStateChanged += async () => await UpdateCartAsync();
+
+		var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+
+		if (localStorageCart is null)
+		{
+			var newList = new List<StoreProduct>();
+			await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", newList);
+			Products = newList;
+			await base.OnInitializedAsync();
+			return;
+		}
+
+			Products = localStorageCart;
+			await base.OnInitializedAsync();
+		}
+
+	private async Task UpdateCartAsync()
+	{
+		Products = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+		StateHasChanged();
+	}
+}
