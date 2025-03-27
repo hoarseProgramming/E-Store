@@ -18,7 +18,7 @@ public static class ContractMapping
             IsInAssortment = request.IsInAssortment
         };
     }
-    
+
     public static Product MapToProduct(this UpdateProductRequest request, int productNumber)
     {
         return new Product()
@@ -64,7 +64,7 @@ public static class ContractMapping
             Address = request.Address,
             ZipCode = request.ZipCode,
             City = request.City,
-            Country = request.Country
+            Country = request.Country,
         };
     }
 
@@ -79,7 +79,7 @@ public static class ContractMapping
             Address = customer.Address,
             ZipCode = customer.ZipCode,
             City = customer.City,
-            Country = customer.Country
+            Country = customer.Country,
         };
     }
 
@@ -129,7 +129,7 @@ public static class ContractMapping
     public static Order MapToOrder(this CreateOrderRequest request)
     {
         var newId = Guid.NewGuid();
-        
+
         return new Order()
         {
             Id = newId,

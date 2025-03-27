@@ -1,4 +1,5 @@
 using EStore.Api.Database;
+using EStore.Api.Models;
 using EStore.Api.Repositories;
 using EStore.Api.Services;
 using EStore.Api.UnitOfWork;
@@ -34,12 +35,19 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
 });
 
-builder.Services.AddIdentityCore<IdentityUser>()
+//builder.Services.AddIdentityCore<IdentityUser>()
+//    .AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<EStoreContext>()
+//    .AddDefaultTokenProviders();
+
+builder.Services.AddIdentityCore<AuthUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<EStoreContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddIdentityApiEndpoints<IdentityUser>();
+//builder.Services.AddIdentityApiEndpoints<IdentityUser>();
+
+builder.Services.AddIdentityApiEndpoints<AuthUser>();
 
 builder.Services.AddCors(options =>
 {
@@ -73,8 +81,11 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//app.MapGroup("/api")
+//    .MapIdentityApi<IdentityUser>();
+
 app.MapGroup("/api")
-    .MapIdentityApi<IdentityUser>();
+    .MapIdentityApi<AuthUser>();
 
 app.MapControllers();
 

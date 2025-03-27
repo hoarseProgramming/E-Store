@@ -1,5 +1,4 @@
 ﻿using EStore.Api.Models;
-using EStore.Api.Repositories;
 using EStore.Api.UnitOfWork;
 
 namespace EStore.Api.Services;
@@ -21,7 +20,6 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
     {
         return _unitOfWork.CustomerRepository.GetByIdAsync(id);
     }
-
     public Task<Customer?> GetByEmailAsync(string email)
     {
         return _unitOfWork.CustomerRepository.GetByEmailAsync(email);

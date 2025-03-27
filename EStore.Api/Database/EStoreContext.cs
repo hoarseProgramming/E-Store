@@ -1,12 +1,16 @@
 ﻿using EStore.Api.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace EStore.Api.Database;
 
-public class EStoreContext(DbContextOptions<EStoreContext> options) : IdentityDbContext(options)
+public class EStoreContext : IdentityDbContext<AuthUser>
 {
+    public EStoreContext(DbContextOptions<EStoreContext> options) : base(options)
+    {
+
+    }
+
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
@@ -14,24 +18,30 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : IdentityDb
     public DbSet<Order> Orders { get; set; }
 
     public DbSet<OrderProduct> OrderProducts { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
+        modelBuilder.Entity<AuthUser>()
+            .HasOne<Customer>()
+            .WithMany()
+            .HasForeignKey(c => c.CustomerId)
+            .IsRequired(false);
+
         modelBuilder.Entity<Product>()
             .HasKey(product => product.ProductNumber);
-        
+
         modelBuilder.Entity<Product>()
             .HasOne<Category>()
             .WithMany()
             .HasForeignKey(c => c.CategoryId);
-        
+
         // modelBuilder.Entity<Product>()
         //     .HasMany(p => p.Orders)
         //     .WithMany(o => o.Products)
         //     .UsingEntity<OrderProduct>();
-        
+
         modelBuilder.Entity<Product>()
             .HasOne<Category>()
             .WithMany()
@@ -43,12 +53,12 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : IdentityDb
             .HasOne<Customer>()
             .WithMany()
             .HasForeignKey(c => c.CustomerId);
-        
+
         // modelBuilder.Entity<Order>()
         //     .HasMany(o => o.Products)
         //     .WithMany(p => p.Orders)
         //     .UsingEntity<OrderProduct>(op => op.HasOne<Order>().WithMany(e => e.OrderProducts));
-        
+
         // modelBuilder.Entity<Order>()
         //     .HasMany(o => o.OrderProducts)
         //     .WithOne()
@@ -62,14 +72,14 @@ public class EStoreContext(DbContextOptions<EStoreContext> options) : IdentityDb
             .WithMany(o => o.OrderProducts)
             .HasForeignKey(e => e.OrderId)
             .OnDelete(DeleteBehavior.NoAction);
-        
+
         modelBuilder.Entity<OrderProduct>()
             .HasOne<Product>()
             .WithMany()
             .HasForeignKey(e => e.ProductNumber)
             .OnDelete(DeleteBehavior.NoAction);
 
-        
+
 
     }
 }
