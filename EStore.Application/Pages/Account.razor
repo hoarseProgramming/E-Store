@@ -17,7 +17,7 @@
     <MudForm @bind-IsValid="@_success">
         <MudTextField @ref="_email" T="string" Label="Email" Required="true" RequiredError="Email is required!"
                       Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
-        <MudTextField @ref="_password" T="string" Label="Password" Required="true" />
+        <MudTextField @ref="_password" T="string" Label="Password" InputType="InputType.Password" Required="true" />
         <MudGrid Class="my-2">
             <MudItem Class="xs-4">
                 <MudButton OnClick="LoginAsync" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
