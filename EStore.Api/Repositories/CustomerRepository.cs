@@ -18,9 +18,11 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
         return customer;
     }
 
-    public Task<Customer?> GetByEmailAsync(string email)
+    public async Task<Customer?> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        var customer = await eStoreContext.Customers.SingleOrDefaultAsync(c => c.Email == email);
+
+        return customer;
     }
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
@@ -36,7 +38,7 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
     public async Task DeleteByIdAsync(Guid id)
     {
         var customer = await eStoreContext.Customers.SingleOrDefaultAsync(c => c.Id == id);
-        
+
         eStoreContext.Remove(customer);
     }
 
@@ -46,4 +48,5 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
 
         return customerExists;
     }
+
 }

@@ -9,4 +9,5 @@ public class CreateCustomerRequest
     public required string ZipCode { get; init; }
     public required string City { get; init; }
     public required string Country { get; init; }
+    public Guid? UserId { get; set; }
 }

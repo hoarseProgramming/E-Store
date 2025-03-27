@@ -2,36 +2,50 @@
 
 @using EStore.Application.Dtos
 @using EStore.Application.Events
+@using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
+@using System.ComponentModel.DataAnnotations
 
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
 <PageTitle>Account</PageTitle>
 
-<form>
-    <input type="email" placeholder="Enter email" @bind="_email" />
-    <input type="password" placeholder="Enter password" @bind="_password" />
-    <button type="button" @onclick="RegisterAsync">Register</button>
-    <button type="button" @onclick="LoginAsync">Login</button>
-    <button type="button" @onclick="LogoutAsync">Log out</button>
-</form>
+<MudForm @bind-IsValid="@_success">
+    <MudTextField @ref="_firstName" T="string" Label="First name" Required="true" RequiredError="User name is required!" />
+    <MudTextField @ref="_lastName" T="string" Label="Last name" Required="true" RequiredError="Last name is required!" />
+    <MudTextField @ref="_email" T="string" Label="Email" Required="true" RequiredError="Email is required!" 
+    Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+    <MudTextField @ref="_address" T="string" Label="Address" Required="true" RequiredError="Address is required!" />
+    <MudTextField @ref="_zipCode" T="string" Label="Zip code" Required="true" RequiredError="Zip Code is required!" />
+    <MudTextField @ref="_city" T="string" Label="City" Required="true" RequiredError="City is required!" />
+    <MudTextField @ref="_country" T="string" Label="Country" Required="true" RequiredError="Country is required!" />
+    <MudTextField @ref="_password" T="string" Label="Password" Required="true" HelperText="Choose a strong password" />
+    <MudButton OnClick="RegisterAsync" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)">Register</MudButton>
+</MudForm>
+
+<p>@_accountInfo</p>
 
 <AuthorizeView AllowedRole="ADMIN">
     <p>Inne</p>
 </AuthorizeView>
 
-<p>@_info</p>
-
 @code
 {
+    private bool _success;
+
     private HttpClient _httpClient;
 
-    private string _email = "";
-    private string _password = "";
-    private string _info = "";
+    private MudTextField<string> _firstName;
+    private MudTextField<string> _lastName;
+    private MudTextField<string> _email;
+    private MudTextField<string> _address;
+    private MudTextField<string> _zipCode;
+    private MudTextField<string> _city;
+    private MudTextField<string> _country;
+    private MudTextField<string> _password;
 
-    private List<ProductResponse> _products = [];
+    private string _accountInfo = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,13 +56,38 @@
 
     private async Task RegisterAsync()
     {
-        var result = await _httpClient.PostAsJsonAsync("api/register", new
+        var accountResult = await _httpClient.PostAsJsonAsync("api/register", new
         {
-            email = _email,
-            password = _password
+            email = _email.Value,
+            password = _password.Value
         });
 
-        _info = result.IsSuccessStatusCode ? "Registration successful" : "Didn't work";
+        if (accountResult.IsSuccessStatusCode)
+        {
+            var createCustomerRequest = new CreateCustomerRequest()
+                {
+                    FirstName = _firstName.Value,
+                    LastName = _lastName.Value,
+                    Email = _email.Value,
+                    Address = _address.Value,
+                    ZipCode = _zipCode.Value,
+                    City = _city.Value,
+                    Country = _country.Value
+                };
+
+            var customerResult = await _httpClient.PostAsJsonAsync<CreateCustomerRequest>("api/customers", createCustomerRequest);
+            var customer = await customerResult.Content.ReadFromJsonAsync<CustomerResponse>();
+
+            var setCustomerRequest = new SetCustomerRequest()
+            {
+                Email = _email.Value,
+                CustomerId = customer.Id
+            };
+
+            var setCustomerResult = await _httpClient.PostAsJsonAsync<SetCustomerRequest>("api/set-customer", setCustomerRequest);
+        }
+
+        _accountInfo = accountResult.IsSuccessStatusCode ? "Registration successful" : "Didn't work";
     }
     private async Task LoginAsync()
     {
@@ -58,6 +97,7 @@
             password = _password
         });
 
+
         if (result.IsSuccessStatusCode)
         {
             var token = await result.Content.ReadFromJsonAsync<LoginResponse>();
@@ -65,13 +105,13 @@
             if (token is not null)
             {
                 await LocalStorage.SetItemAsync("eStoreToken", token.AccessToken);
-                _info = "Login successful";
+                _accountInfo = "Login successful";
                 await AuthPublisher.OnAuthenticationStateChanged();
             }
         }
         else
         {
-            _info = "Didn't work";
+            _accountInfo = "Didn't work";
         }
     }
 

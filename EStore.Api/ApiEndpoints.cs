@@ -13,9 +13,9 @@ public static class ApiEndpoints
         public const string Get = $"{Base}/{{productNumber:int}}";
 
         public const string GetAll = Base;
-        
+
         public const string Update = $"{Base}/{{productNumber:int}}";
-        
+
         public const string Delete = $"{Base}/{{productNumber:int}}";
     }
 
@@ -28,12 +28,12 @@ public static class ApiEndpoints
         public const string Get = $"{Base}/{{id:Guid}}";
 
         public const string GetAll = Base;
-        
+
         public const string Update = $"{Base}/{{id:Guid}}";
-        
+
         public const string Delete = $"{Base}/{{id:Guid}}";
     }
-    
+
     public static class Categories
     {
         private const string Base = $"{ApiBase}/categories";
@@ -43,7 +43,7 @@ public static class ApiEndpoints
         public const string Get = $"{Base}/{{id:Guid}}";
 
         public const string GetAll = Base;
-        
+
         public const string Delete = $"{Base}/{{id:Guid}}";
     }
 
@@ -59,10 +59,15 @@ public static class ApiEndpoints
 
         public const string Delete = $"{Base}/{{id:Guid}}";
     }
-    
+
     public static class Auth
     {
         public const string Get = $"{ApiBase}/roles";
+
+        public const string GetUserIdByEmail = $"{ApiBase}/get-user-id";
+
+        public const string SetCustomerId = $"{ApiBase}/set-customer";
+
         public const string RegisterAdmin = $"{ApiBase}/register-admin";
 
     }
