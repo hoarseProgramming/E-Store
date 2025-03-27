@@ -1,0 +1,102 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@inject IDialogService DialogService
+@inject IHttpClientFactory Factory;
+
+<MudDialog>
+    <TitleContent>
+        Register
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudPaper Class="pa-4">
+                    <MudForm @bind-IsValid="@_success">
+                        <MudTextField @ref="_firstName" T="string" Label="First name" Required="true" RequiredError="User name is required!" />
+                        <MudTextField @ref="_lastName" T="string" Label="Last name" Required="true" RequiredError="Last name is required!" />
+                        <MudTextField @ref="_email" T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                        Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+                        <MudTextField @ref="_address" T="string" Label="Address" Required="true" RequiredError="Address is required!" />
+                        <MudTextField @ref="_zipCode" T="string" Label="Zip code" Required="true" RequiredError="Zip Code is required!" />
+                        <MudTextField @ref="_city" T="string" Label="City" Required="true" RequiredError="City is required!" />
+                        <MudTextField @ref="_country" T="string" Label="Country" Required="true" RequiredError="Country is required!" />
+                        <MudTextField @ref="_password" T="string" Label="Password" Required="true" HelperText="Choose a strong password" />
+                    </MudForm>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@(!_success)" OnClick="RegisterAsync">Add thing</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _success;
+
+    private HttpClient _httpClient;
+
+    private MudTextField<string> _firstName;
+    private MudTextField<string> _lastName;
+    private MudTextField<string> _email;
+    private MudTextField<string> _address;
+    private MudTextField<string> _zipCode;
+    private MudTextField<string> _city;
+    private MudTextField<string> _country;
+    private MudTextField<string> _password;
+
+    private string _accountInfo = "";
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _httpClient = Factory.CreateClient("backend");
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task RegisterAsync()
+    {
+        var accountResult = await _httpClient.PostAsJsonAsync("api/register", new
+        {
+            email = _email.Value,
+            password = _password.Value
+        });
+
+        if (accountResult.IsSuccessStatusCode)
+        {
+            var createCustomerRequest = new CreateCustomerRequest()
+                {
+                    FirstName = _firstName.Value,
+                    LastName = _lastName.Value,
+                    Email = _email.Value,
+                    Address = _address.Value,
+                    ZipCode = _zipCode.Value,
+                    City = _city.Value,
+                    Country = _country.Value
+                };
+
+            var customerResult = await _httpClient.PostAsJsonAsync<CreateCustomerRequest>("api/customers", createCustomerRequest);
+            var customer = await customerResult.Content.ReadFromJsonAsync<CustomerResponse>();
+
+            var setCustomerRequest = new SetCustomerRequest()
+                {
+                    Email = _email.Value,
+                    CustomerId = customer.Id
+                };
+
+            var setCustomerResult = await _httpClient.PostAsJsonAsync<SetCustomerRequest>("api/set-customer", setCustomerRequest);
+
+            MudDialog.Close(DialogResult.Ok("Registration successful"));
+        }
+
+        _accountInfo = accountResult.IsSuccessStatusCode ? "Registration successful" : "Didn't work";
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+}
