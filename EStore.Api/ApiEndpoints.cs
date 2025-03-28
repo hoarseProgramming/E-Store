@@ -62,13 +62,15 @@ public static class ApiEndpoints
 
     public static class Auth
     {
-        public const string Get = $"{ApiBase}/roles";
+        private const string Base = $"{ApiBase}/user";
 
-        public const string GetUserIdByEmail = $"{ApiBase}/get-user-id";
+        public const string Get = $"{Base}/info";
 
-        public const string SetCustomerId = $"{ApiBase}/set-customer";
+        public const string SetCustomerId = $"{Base}/set-customer";
 
-        public const string RegisterAdmin = $"{ApiBase}/register-admin";
+        public const string UpdateUserAndCustomer = $"{Base}/{{id:Guid}}";
+
+        //public const string RegisterAdmin = $"{Base}/register-admin";
 
     }
 }

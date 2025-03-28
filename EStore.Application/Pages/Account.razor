@@ -1,14 +1,19 @@
 ﻿@page "/account"
 
+@using EStore.Application.ApplicationModels
 @using EStore.Application.Dtos
 @using EStore.Application.Events
+@using EStore.Application.Interfaces
+@using EStore.Application.Mapping
 @using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Http.Headers
 
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 @inject IDialogService DialogService
+@inject IAuthenticationStateProvider StateProvider
 
 
 <PageTitle>Account</PageTitle>
@@ -16,33 +21,31 @@
 <MudPaper Height="calc(100vh - 65px)" Width="100%" Class="d-flex justify-center align-start">
     <MudForm @bind-IsValid="@_success">
         <MudTextField @ref="_email" T="string" Label="Email" Required="true" RequiredError="Email is required!"
-                      Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+        Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
         <MudTextField @ref="_password" T="string" Label="Password" InputType="InputType.Password" Required="true" />
         <MudGrid Class="my-2">
-            <MudItem Class="xs-4">
+            <MudItem Class="xs-6">
                 <MudButton OnClick="LoginAsync" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
             </MudItem>
-            <MudItem Class="xs-4">
+            <MudItem Class="xs-6">
                 <MudButton OnClick="LogoutAsync" Variant="Variant.Filled" Color="Color.Primary">Logout</MudButton>
             </MudItem>
-            <MudItem Class="xs-4">
+        </MudGrid>
+        <MudGrid Class="my-2">
+            <MudItem Class="xs-6">
                 <MudButton OnClick="OpenRegisterDialogAsync" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+            </MudItem>
+            <MudItem Class="xs-6">
+                <MudButton OnClick="OpenUpdateCustomerDialogAsync" Disabled="!_isAuthenticated" Variant="Variant.Filled" Color="Color.Primary">Update user info</MudButton>
             </MudItem>
         </MudGrid>
     </MudForm>
     <p>@_accountInfo</p>
 </MudPaper>
 
-
-
-
-
-<AuthorizeView AllowedRole="ADMIN">
-    <p>Inne</p>
-</AuthorizeView>
-
 @code
 {
+    private bool _isAuthenticated;
     private bool _success;
 
     private HttpClient _httpClient;
@@ -54,9 +57,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        AuthPublisher.AuthenticationStateChanged += async () => await UpdateState();
         _httpClient = Factory.CreateClient("backend");
 
+        await UpdateState();
         await base.OnInitializedAsync();
+    }
+
+    public async Task UpdateState()
+    {
+        _isAuthenticated = await StateProvider.IsAuthenticatedAsync();
+
+        StateHasChanged();
     }
 
     private async Task OpenRegisterDialogAsync()
@@ -77,14 +89,48 @@
             _accountInfo = (string)result.Data;
         }
     }
+
+    private async Task OpenUpdateCustomerDialogAsync()
+    {
+        var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var userInfo = await _httpClient.GetFromJsonAsync<UserInfoResponse>("api/user/info");
+
+        if (userInfo.CustomerId is null)
+        {
+            _accountInfo = "Not able to update admin info";
+            return;
+        }
+
+        var customer = await _httpClient.GetFromJsonAsync<CustomerResponse>($"api/customers/{userInfo.CustomerId}");
+
+        var parameters = new DialogParameters<UpdateCustomerDialog>{
+            { d => d.Customer, customer.MapToAppCustomer() }
+        };
+        var options = new DialogOptions
+            {
+                CloseOnEscapeKey = true,
+                MaxWidth = MaxWidth.Medium,
+                FullWidth = true
+            };
+
+        var dialog = await DialogService.ShowAsync<UpdateCustomerDialog>("Register", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            _accountInfo = (string)result.Data;
+        }
+    }
     private async Task LoginAsync()
     {
-        var result = await _httpClient.PostAsJsonAsync("api/login", new
+        var result = await _httpClient.PostAsJsonAsync("api/user/login", new
         {
             email = _email.Value,
             password = _password.Value
         });
-
 
         if (result.IsSuccessStatusCode)
         {
@@ -94,6 +140,16 @@
             {
                 await LocalStorage.SetItemAsync("eStoreToken", token.AccessToken);
                 _accountInfo = "Login successful";
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+                var userInfo = await _httpClient.GetFromJsonAsync<UserInfoResponse>("api/user/info");
+
+                if (userInfo is not null)
+                {
+                    await LocalStorage.SetItemAsync("CurrentUserId", userInfo.Id);
+                }
+
                 await AuthPublisher.OnAuthenticationStateChanged();
             }
         }

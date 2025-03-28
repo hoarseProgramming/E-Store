@@ -26,7 +26,6 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     [HttpGet(ApiEndpoints.Customers.Get)]
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
-
         var customer = await _customerService.GetByIdAsync(id);
 
 

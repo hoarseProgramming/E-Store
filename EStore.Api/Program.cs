@@ -28,6 +28,9 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderProductRepository, OrderProductRepository>();
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthorization(options =>
@@ -84,7 +87,7 @@ app.UseAuthorization();
 //app.MapGroup("/api")
 //    .MapIdentityApi<IdentityUser>();
 
-app.MapGroup("/api")
+app.MapGroup("/api/user")
     .MapIdentityApi<AuthUser>();
 
 app.MapControllers();

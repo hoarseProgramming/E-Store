@@ -3,6 +3,7 @@
 @using EStore.Contracts.Responses
 @inject IDialogService DialogService
 @inject IHttpClientFactory Factory;
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
 <MudDialog>
     <TitleContent>
@@ -61,7 +62,7 @@
 
     private async Task RegisterAsync()
     {
-        var accountResult = await _httpClient.PostAsJsonAsync("api/register", new
+        var accountResult = await _httpClient.PostAsJsonAsync("api/user/register", new
         {
             email = _email.Value,
             password = _password.Value
@@ -89,7 +90,7 @@
                     CustomerId = customer.Id
                 };
 
-            var setCustomerResult = await _httpClient.PostAsJsonAsync<SetCustomerRequest>("api/set-customer", setCustomerRequest);
+            var setCustomerResult = await _httpClient.PostAsJsonAsync<SetCustomerRequest>("api/user/set-customer", setCustomerRequest);
 
             MudDialog.Close(DialogResult.Ok("Registration successful"));
         }

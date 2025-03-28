@@ -1,7 +1,10 @@
 ﻿namespace EStore.Contracts.Responses
 {
-    public class UserResponse
+    public class UserInfoResponse
     {
-        public IEnumerable<object>? Roles { get; set; }
+        public Guid Id { get; set; }
+        public Guid? CustomerId { get; set; }
+        public IEnumerable<Role>? Roles { get; set; }
     }
+    public record Role(string Name);
 }

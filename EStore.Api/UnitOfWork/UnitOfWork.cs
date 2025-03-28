@@ -1,6 +1,5 @@
 ﻿using EStore.Api.Database;
 using EStore.Api.Repositories;
-using EStore.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
@@ -10,9 +9,9 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly EStoreContext _eStoreContext;
     private readonly IServiceProvider _serviceProvider;
-    
+
     private bool _disposed = false;
-    
+
     public UnitOfWork(EStoreContext eStoreContext, IServiceProvider serviceProvider)
     {
         _eStoreContext = eStoreContext;
@@ -24,6 +23,7 @@ public class UnitOfWork : IUnitOfWork
     public IProductRepository ProductRepository => _serviceProvider.GetService<IProductRepository>();
     public IOrderRepository OrderRepository => _serviceProvider.GetService<IOrderRepository>();
     public IOrderProductRepository OrderProductRepository => _serviceProvider.GetService<IOrderProductRepository>();
+    public IUserRepository UserRepository => _serviceProvider.GetService<IUserRepository>();
 
     public async Task<int> SaveChangesAsync()
     {
@@ -35,7 +35,7 @@ public class UnitOfWork : IUnitOfWork
         await _eStoreContext.Database.OpenConnectionAsync();
 
         int result = 0;
-        
+
         try
         {
             await _eStoreContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT dbo.Products ON");
@@ -61,12 +61,12 @@ public class UnitOfWork : IUnitOfWork
         }
         _disposed = true;
     }
-    
+
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
-    
+
 }

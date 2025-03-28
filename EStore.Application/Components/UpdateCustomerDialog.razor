@@ -1,0 +1,93 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using EStore.Application.ApplicationModels
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@inject IDialogService DialogService
+@inject IHttpClientFactory Factory;
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+
+<MudDialog>
+    <TitleContent>
+        Update user info
+    </TitleContent>
+    <DialogContent>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudPaper Class="pa-4">
+                    <MudForm @bind-IsValid="@_success">
+                        <MudTextField @bind-Value="Customer.FirstName" @ref="_firstName" T="string" Label="First name" Required="true" RequiredError="User name is required!" />
+                        <MudTextField @bind-Value="Customer.LastName" @ref="_lastName" T="string" Label="Last name" Required="true" RequiredError="Last name is required!" />
+                        <MudTextField @bind-Value="Customer.Email" @ref="_email" T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                        Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+                        <MudTextField @bind-Value="Customer.Address" @ref="_address" T="string" Label="Address" Required="true" RequiredError="Address is required!" />
+                        <MudTextField @bind-Value="Customer.ZipCode" @ref="_zipCode" T="string" Label="Zip code" Required="true" RequiredError="Zip Code is required!" />
+                        <MudTextField @bind-Value="Customer.City" @ref="_city" T="string" Label="City" Required="true" RequiredError="City is required!" />
+                        <MudTextField @bind-Value="Customer.Country" @ref="_country" T="string" Label="Country" Required="true" RequiredError="Country is required!" />
+                    </MudForm>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Disabled="@(!_success)" OnClick="UpdateAsync">Update</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private bool _success;
+
+    private HttpClient _httpClient;
+
+    private MudTextField<string> _firstName;
+    private MudTextField<string> _lastName;
+    private MudTextField<string> _email;
+    private MudTextField<string> _address;
+    private MudTextField<string> _zipCode;
+    private MudTextField<string> _city;
+    private MudTextField<string> _country;
+
+    private string _accountInfo = "";
+
+    [Parameter]
+    public AppCustomer? Customer { get; set; }
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _httpClient = Factory.CreateClient("backend");
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task UpdateAsync()
+    {
+        UpdateUserAndCustomerRequest request = new()
+            {
+                FirstName = _firstName.Value,
+                LastName = _lastName.Value,
+                Email = _email.Value,
+                Address = _address.Value,
+                ZipCode = _zipCode.Value,
+                City = _city.Value,
+                Country = _country.Value,
+            };
+
+        var id = await LocalStorage.GetItemAsync<Guid>("CurrentUserId");
+
+        var result = await _httpClient.PutAsJsonAsync<UpdateUserAndCustomerRequest>($"api/user/{id}", request);
+
+        if (result.IsSuccessStatusCode)
+        {
+            MudDialog.Close(DialogResult.Ok("Updated successfully"));
+        }
+        //Todo:
+        //Show that it didn't work
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+}
