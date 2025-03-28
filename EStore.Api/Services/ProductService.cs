@@ -1,5 +1,4 @@
 ﻿using EStore.Api.Models;
-using EStore.Api.Repositories;
 using EStore.Api.UnitOfWork;
 
 namespace EStore.Api.Services;
@@ -52,7 +51,7 @@ public class ProductService(IUnitOfWork unitOfWork) : IProductService
     public async Task<bool> DeleteByProductNumberAsync(int productNumber)
     {
         var productExists = await _unitOfWork.ProductRepository.ExistsByProductNumberAsync(productNumber);
-        
+
         if (!productExists)
         {
             return false;

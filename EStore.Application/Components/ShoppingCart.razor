@@ -5,28 +5,21 @@
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
 <MudPaper Height="100%" Width="100%">
-	<MudPaper Height="90%" Width="100%">
+	<MudPaper Height="5%" Class="d-flex justify-center align-center mud-width-full pa-2">
+		ShoppingCart
+	</MudPaper>
+	<MudPaper Height="85%" Width="100%" Class="overflow-scroll">
 		<MudStack Spacing="0">
-			<MudPaper Class="d-flex justify-center align-center mud-width-full pa-2">
-				ShoppingCart
-			</MudPaper>
 			@foreach (var product in Products)
 			{
 				<ProductInCart Product="product"></ProductInCart>
 			}
 		</MudStack>
-		<MudPaper></MudPaper>
 	</MudPaper>
 	<MudPaper Height="10%" Class="d-flex justify-center align-center">
-		<MudButton>Add to cart</MudButton>
+		<MudButton>Place order</MudButton>
 	</MudPaper>
 </MudPaper>
-
-
-
-
-
-
 
 @code {
 	public List<StoreProduct> Products { get; set; } = [];
