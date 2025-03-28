@@ -39,7 +39,7 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
     {
         var customer = await eStoreContext.Customers.SingleOrDefaultAsync(c => c.Id == id);
 
-        eStoreContext.Remove(customer);
+        eStoreContext.Remove((Customer)customer);
     }
 
     public async Task<bool> ExistsByIdAsync(Guid id)

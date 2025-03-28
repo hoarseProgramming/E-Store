@@ -6,19 +6,40 @@
 
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+<MudGrid>
+    <MudItem xs="8">
+        <MudPaper Class="ms-2 mt-1 d-flex justify-center align-center">
+            <MudTextField 
+                Immediate="true"
+                Text="@_searchString" TextChanged="SearchAsync" Placeholder="Search for product name or number" Class="pa-1" T="string"></MudTextField>
+            @* <MudButton OnClick="SearchAsync">Search</MudButton> *@
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="4">
+        <MudPaper Height="100%" Class="me-2 ms-1 d-flex justify-center align-center">
+            Shop
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <MudStack Class="mx-2" Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Start">
+            @foreach (var product in _shownProducts)
+            {
+                <ProductComponent Product="product"></ProductComponent>
+            }
+        </MudStack>
+    </MudItem>
+</MudGrid>
 
-<MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Start">
-    @foreach (var product in Products)
-    {
-        <ProductComponent Product="product"></ProductComponent>
-    }
-</MudStack>
 
 
 @code {
+    private string _searchString = string.Empty;
+
     private HttpClient _httpClient;
 
-    private List<StoreProduct> Products = [];
+    private List<StoreProduct> _shownProducts = [];
+
+    private List<StoreProduct> _allProducts = [];
 
     private List<StoreProduct> _productsInCart = [];
 
@@ -31,7 +52,8 @@
 
         if (productsResponse is not null)
         {
-            Products = productsResponse.MapToStoreProducts().ToList();
+            _allProducts = productsResponse.MapToStoreProducts().ToList();
+            _shownProducts = _allProducts.Where(p => p.IsInAssortment).ToList();
         }
 
         var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
@@ -39,5 +61,25 @@
         // StateHasChanged();
 
         await base.OnInitializedAsync();
+    }
+
+    public void SearchAsync(string? value)
+    {
+        if (String.IsNullOrWhiteSpace(value))
+        {
+            _searchString = string.Empty;
+            _shownProducts = _allProducts;
+            return;
+        }
+        _searchString = value;
+
+        bool isProductNumber = Int32.TryParse(_searchString, out int productNumber);
+
+        if (isProductNumber)
+        {
+            _shownProducts = _allProducts.Where(p => p.ProductNumber == productNumber).ToList();
+            return;
+        }
+        _shownProducts = _allProducts.Where(p => p.ProductName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }
