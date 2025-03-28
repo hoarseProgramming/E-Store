@@ -1,9 +1,8 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using Blazored.LocalStorage;
-using EStore.Application.Dtos;
-using EStore.Application.Events;
+﻿using Blazored.LocalStorage;
 using EStore.Application.Interfaces;
+using EStore.Contracts.Responses;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 namespace EStore.Application.Services;
 
@@ -16,13 +15,13 @@ public class AuthenticationStateProvider : IAuthenticationStateProvider
     {
         _httpClient = factory.CreateClient("backend");
         _localStorage = localStorage;
-        
+
     }
     public async Task<bool> IsAuthenticatedAsync()
     {
         var token = await _localStorage.GetItemAsync<string>("eStoreToken");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var result = await _httpClient.GetAsync("api/manage/info");
+        var result = await _httpClient.GetAsync("api/user/manage/info");
 
         return result.IsSuccessStatusCode;
     }
@@ -31,15 +30,15 @@ public class AuthenticationStateProvider : IAuthenticationStateProvider
     {
         var token = await _localStorage.GetItemAsync<string>("eStoreToken");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var result = await _httpClient.GetAsync("api/roles");
+        var response = await _httpClient.GetAsync("api/user/info");
 
-        if (result.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode)
         {
-            var roles = await result.Content.ReadFromJsonAsync<List<GetRolesResponse>>();
+            var userInfo = await response.Content.ReadFromJsonAsync<UserInfoResponse>();
 
-            if (roles.Any())
+            if (userInfo.Roles.Any())
             {
-                return roles.FirstOrDefault().value;
+                return userInfo.Roles.FirstOrDefault().Name;
             }
         }
 

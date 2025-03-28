@@ -22,5 +22,19 @@ namespace EStore.Application.Mapping
         {
             return response.Products.Select(MapToStoreProduct);
         }
+
+        public static AppCustomer MapToAppCustomer(this CustomerResponse response)
+        {
+            return new AppCustomer()
+            {
+                FirstName = response.FirstName,
+                LastName = response.LastName,
+                Email = response.Email,
+                Address = response.Address,
+                ZipCode = response.ZipCode,
+                City = response.City,
+                Country = response.Country
+            };
+        }
     }
 }

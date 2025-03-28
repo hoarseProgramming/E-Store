@@ -185,4 +185,19 @@ public static class ContractMapping
     {
         return orderProducts.Select(MapToResponse);
     }
+
+    public static Customer MapToCustomer(this UpdateUserAndCustomerRequest request, Guid id)
+    {
+        return new Customer()
+        {
+            Id = id,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            Address = request.Address,
+            ZipCode = request.ZipCode,
+            City = request.City,
+            Country = request.Country
+        };
+    }
 }
