@@ -33,8 +33,14 @@ namespace EStore.Application.Mapping
                 Address = response.Address,
                 ZipCode = response.ZipCode,
                 City = response.City,
-                Country = response.Country
+                Country = response.Country,
+                Orders = response.Orders
             };
+        }
+
+        public static IEnumerable<AppCustomer> MapToAppCustomers(this CustomersResponse response)
+        {
+            return response.Customers.Select(MapToAppCustomer);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace EStore.Application.ApplicationModels
+﻿using EStore.Contracts.Responses;
+
+namespace EStore.Application.ApplicationModels
 {
     public class AppCustomer
     {
@@ -9,5 +11,6 @@
         public required string ZipCode { get; set; }
         public required string City { get; set; }
         public required string Country { get; set; }
+        public required List<OrderResponse> Orders { get; set; } = [];
     }
 }

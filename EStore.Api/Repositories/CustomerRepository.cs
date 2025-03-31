@@ -27,7 +27,10 @@ public class CustomerRepository(EStoreContext eStoreContext) : ICustomerReposito
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
-        return await eStoreContext.Customers.ToListAsync();
+        return await eStoreContext.Customers
+            .Include(c => c.Orders)
+            .ThenInclude(o => o.OrderProducts)
+            .ToListAsync();
     }
 
     public void Update(Customer customer)

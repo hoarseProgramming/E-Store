@@ -6,7 +6,7 @@ namespace EStore.Api.Repositories;
 
 public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
 {
-    
+
     public void Create(Product product)
     {
         eStoreContext.Products.Add(product);
@@ -21,7 +21,9 @@ public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        return await eStoreContext.Products.ToListAsync();
+        return await eStoreContext.Products
+            .Include(p => p.Category)
+            .ToListAsync();
     }
 
     public void Update(Product product)

@@ -1,0 +1,46 @@
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Application.Mapping
+@using EStore.Contracts.Responses
+@page "/admin/products"
+@inject IHttpClientFactory Factory
+
+<MudGrid>
+	<MudItem xs="12">
+		<MudTable T="AppCustomer"
+			Items="Customers"
+			Loading="_loading"
+			LoadingProgressColor="Color.Info">
+
+			<LoadingContent>
+				<MudText>Loading</MudText>
+			</LoadingContent>
+
+		</MudTable>
+	</MudItem>
+</MudGrid>
+
+@code {
+	private HttpClient _httpClient;
+	private bool _loading;
+	public List<AppCustomer> Customers { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		_httpClient = Factory.CreateClient("backend");
+
+		try
+		{
+			var response = await _httpClient.GetFromJsonAsync<CustomersResponse>("api/customers");
+
+			Customers = response.MapToAppCustomers().ToList();
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
+		finally
+		{
+			_loading = false;
+		}
+	}
+}

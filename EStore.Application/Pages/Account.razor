@@ -119,9 +119,15 @@
 
         var result = await dialog.Result;
 
+        var loginInfo = (LoginInfo)result.Data;
+
         if (!result.Canceled)
         {
-            _accountInfo = (string)result.Data;
+            _email.Value = loginInfo.Email;
+            _password.Value = loginInfo.Password;
+            await LoginAsync();
+            _accountInfo = "Success";
+            StateHasChanged();
         }
     }
     private async Task LoginAsync()

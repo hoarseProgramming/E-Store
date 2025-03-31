@@ -24,6 +24,7 @@
                         <MudTextField @bind-Value="Customer.ZipCode" @ref="_zipCode" T="string" Label="Zip code" Required="true" RequiredError="Zip Code is required!" />
                         <MudTextField @bind-Value="Customer.City" @ref="_city" T="string" Label="City" Required="true" RequiredError="City is required!" />
                         <MudTextField @bind-Value="Customer.Country" @ref="_country" T="string" Label="Country" Required="true" RequiredError="Country is required!" />
+                        <MudTextField @ref="_password" T="string" Label="Password" Required="true" InputType="InputType.Password" HelperText="Account password needed" />
                     </MudForm>
                 </MudPaper>
             </MudItem>
@@ -47,6 +48,7 @@
     private MudTextField<string> _zipCode;
     private MudTextField<string> _city;
     private MudTextField<string> _country;
+    private MudTextField<string> _password;
 
     private string _accountInfo = "";
 
@@ -82,7 +84,7 @@
 
         if (result.IsSuccessStatusCode)
         {
-            MudDialog.Close(DialogResult.Ok("Updated successfully"));
+            MudDialog.Close(DialogResult.Ok(new LoginInfo { Email = _email.Value, Password = _password.Value}));
         }
         //Todo:
         //Show that it didn't work

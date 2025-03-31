@@ -7,5 +7,6 @@ public class ProductResponse
     public required string Description { get; init; }
     public required double Price { get; init; }
     public Guid? CategoryId { get; init; }
+    public CategoryResponse? Category { get; init; }
     public required bool IsInAssortment { get; init; }
 }
