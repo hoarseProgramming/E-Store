@@ -33,36 +33,20 @@ public class EStoreContext : IdentityDbContext<AuthUser>
             .HasKey(product => product.ProductNumber);
 
         modelBuilder.Entity<Product>()
-            .HasOne<Category>()
-            .WithMany()
-            .HasForeignKey(c => c.CategoryId);
-
-        // modelBuilder.Entity<Product>()
-        //     .HasMany(p => p.Orders)
-        //     .WithMany(o => o.Products)
-        //     .UsingEntity<OrderProduct>();
-
-        modelBuilder.Entity<Product>()
-            .HasOne<Category>()
+            .HasOne(c => c.Category)
             .WithMany()
             .HasForeignKey(c => c.CategoryId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
 
-        modelBuilder.Entity<Order>()
-            .HasOne<Customer>()
-            .WithMany()
-            .HasForeignKey(c => c.CustomerId);
+        //modelBuilder.Entity<Order>()
+        //    .HasOne<Customer>()
+        //    .WithMany(c => c.Orders)
+        //    .HasForeignKey(c => c.CustomerId);
 
-        // modelBuilder.Entity<Order>()
-        //     .HasMany(o => o.Products)
-        //     .WithMany(p => p.Orders)
-        //     .UsingEntity<OrderProduct>(op => op.HasOne<Order>().WithMany(e => e.OrderProducts));
-
-        // modelBuilder.Entity<Order>()
-        //     .HasMany(o => o.OrderProducts)
-        //     .WithOne()
-        //     .HasForeignKey(op => new { op.ProductNumber, op.OrderId });
+        modelBuilder.Entity<Customer>()
+            .HasMany(c => c.Orders)
+            .WithOne();
 
         modelBuilder.Entity<OrderProduct>()
             .HasKey(op => new { op.ProductNumber, op.OrderId });

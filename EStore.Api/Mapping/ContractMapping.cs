@@ -41,6 +41,7 @@ public static class ContractMapping
             Description = product.Description,
             Price = product.Price,
             CategoryId = product.CategoryId,
+            Category = product.Category?.MapToResponse(),
             IsInAssortment = product.IsInAssortment
         };
     }
@@ -80,12 +81,16 @@ public static class ContractMapping
             ZipCode = customer.ZipCode,
             City = customer.City,
             Country = customer.Country,
+            Orders = customer.Orders.Select(MapToResponse).ToList()
         };
     }
 
-    public static IEnumerable<CustomerResponse> MapToResponse(this IEnumerable<Customer> customers)
+    public static CustomersResponse MapToResponse(this IEnumerable<Customer> customers)
     {
-        return customers.Select(MapToResponse);
+        return new CustomersResponse()
+        {
+            Customers = customers.Select(MapToResponse)
+        };
     }
 
     public static Customer MapToCustomer(this UpdateCustomerRequest request, Guid id)

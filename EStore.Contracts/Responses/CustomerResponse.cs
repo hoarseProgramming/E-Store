@@ -10,4 +10,5 @@ public class CustomerResponse
     public required string ZipCode { get; init; }
     public required string City { get; init; }
     public required string Country { get; init; }
+    public required List<OrderResponse> Orders { get; set; }
 }

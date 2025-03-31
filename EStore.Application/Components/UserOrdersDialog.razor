@@ -1,0 +1,60 @@
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Contracts.Responses
+@inject IDialogService DialogService
+
+<MudDialog>
+	<TitleContent>
+		Orders
+	</TitleContent>
+	<DialogContent>
+		<MudTable T="OrderResponse"
+		Items="Customer.Orders"
+		Hover="true"
+		Class="overflow-scroll"
+		FixedHeader="true"
+		OnRowClick="RowClickEvent">
+
+			<HeaderContent>
+				<MudTh>Id</MudTh>
+			</HeaderContent>
+			<RowTemplate>
+				<MudTd DataLabel="Thing">@context.Id</MudTd>
+			</RowTemplate>
+		</MudTable>
+
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="Close">Close</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	[Parameter]
+	public AppCustomer Customer { get; set; }
+
+	private async Task RowClickEvent(TableRowClickEventArgs<OrderResponse> tableRowClickEventArgs)
+	{
+		await OpenUserOrdersDialogAsync(tableRowClickEventArgs.Item);
+	}
+
+	private async Task OpenUserOrdersDialogAsync(OrderResponse order)
+	{
+		var parameters = new DialogParameters<ShowOrderDialog>
+		{
+			{ t => t.Order, order }
+		};
+
+		var options = new DialogOptions
+			{
+				CloseOnEscapeKey = true,
+				FullScreen = true
+			};
+
+		var dialog = await DialogService.ShowAsync<ShowOrderDialog>("Order info", parameters, options);
+	}
+
+	private void Close() => MudDialog.Close();
+}

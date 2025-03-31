@@ -1,0 +1,38 @@
+﻿@using EStore.Contracts.Responses
+
+<MudDialog>
+	<TitleContent>
+		Order: @Order.Id
+	</TitleContent>
+	<DialogContent>
+		<MudTable T="OrderProductResponse"
+				  Items="Order.Products"
+				  Hover="true"
+				  Class="overflow-scroll"
+				  FixedHeader="true">
+
+			<HeaderContent>
+				<MudTh>Product number</MudTh>
+				<MudTh>Quantity</MudTh>
+			</HeaderContent>
+			<RowTemplate>
+				<MudTd DataLabel="Thing">@context.ProductNumber</MudTd>
+				<MudTd DataLabel="Thing">@context.Quantity</MudTd>
+			</RowTemplate>
+		</MudTable>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="Close">Close</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	[Parameter]
+	public OrderResponse Order { get; set; }
+
+	private void Close() => MudDialog.Close();
+
+}

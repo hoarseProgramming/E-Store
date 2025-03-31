@@ -7,7 +7,7 @@ namespace EStore.Api.Repositories;
 public class OrderRepository(EStoreContext eStoreContext) : IOrderRepository
 {
     private readonly EStoreContext _eStoreContext = eStoreContext;
-    
+
     public void Create(Order order)
     {
         _eStoreContext.Orders.Add(order);

@@ -1,0 +1,104 @@
+﻿@page "/admin/customers"
+@using EStore.Application.ApplicationModels
+@using EStore.Application.Mapping
+@using EStore.Contracts.Responses
+@inject IHttpClientFactory Factory
+@inject IDialogService DialogService
+
+
+<MudPaper Width="100%" Height="100%">
+	<MudTable T="AppCustomer"
+			  Filter="new Func<AppCustomer, bool>(FilterFunc1)"
+			  Items="Customers"
+			  Hover="true"
+			  Loading="_loading"
+			  LoadingProgressColor="Color.Info"
+			  Class="overflow-scroll"
+			  FixedHeader="true"
+			  OnRowClick="RowClickEvent">
+
+		<ToolBarContent>
+			<MudTextField @ref="searchField" @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+		</ToolBarContent>
+
+		<HeaderContent>
+			<MudTh>First name</MudTh>
+			<MudTh>Last name</MudTh>
+			<MudTh>Email</MudTh>
+		</HeaderContent>
+
+		<RowTemplate>
+			@if (!_loading)
+			{
+				<MudTd DataLabel="Thing">@context.FirstName</MudTd>
+				<MudTd DataLabel="Quantity">@context.LastName</MudTd>
+				<MudTd DataLabel="Location">@context.Email</MudTd>
+			}
+		</RowTemplate>
+		<LoadingContent>
+			<MudText>Loading</MudText>
+		</LoadingContent>
+
+	</MudTable>
+</MudPaper>
+
+@code {
+	private HttpClient _httpClient;
+	private bool _loading;
+	public List<AppCustomer> Customers { get; set; } = new();
+
+	private MudTextField<string> searchField;
+	private string _searchString;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_httpClient = Factory.CreateClient("backend");
+
+		try
+		{
+			var response = await _httpClient.GetFromJsonAsync<CustomersResponse>("api/customers");
+
+			Customers = response.MapToAppCustomers().ToList();
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
+		finally
+		{
+			_loading = false;
+		}
+	}
+
+	private bool FilterFunc1(AppCustomer customer) => FilterFunc(customer, _searchString);
+
+	private bool FilterFunc(AppCustomer customer, string _searchString)
+	{
+		if (string.IsNullOrWhiteSpace(_searchString))
+			return true;
+		if (customer.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+
+	private async Task RowClickEvent(TableRowClickEventArgs<AppCustomer> tableRowClickEventArgs)
+	{
+		await OpenUserOrdersDialogAsync(tableRowClickEventArgs.Item);
+	}
+
+	private async Task OpenUserOrdersDialogAsync(AppCustomer customer)
+	{
+		var parameters = new DialogParameters<UserOrdersDialog>
+		{
+			{ t => t.Customer, customer }
+		};
+
+		var options = new DialogOptions
+			{
+				CloseOnEscapeKey = true,
+				FullScreen = true
+			};
+
+		var dialog = await DialogService.ShowAsync<UserOrdersDialog>("User orders", parameters, options);
+	}
+}
