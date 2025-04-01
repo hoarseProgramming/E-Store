@@ -12,7 +12,6 @@
             <MudTextField 
                 Immediate="true"
                 Text="@_searchString" TextChanged="SearchAsync" Placeholder="Search for product name or number" Class="pa-1" T="string"></MudTextField>
-            @* <MudButton OnClick="SearchAsync">Search</MudButton> *@
         </MudPaper>
     </MudItem>
     <MudItem xs="4">
@@ -58,8 +57,6 @@
 
         var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
 
-        // StateHasChanged();
-
         await base.OnInitializedAsync();
     }
 
@@ -77,9 +74,9 @@
 
         if (isProductNumber)
         {
-            _shownProducts = _allProducts.Where(p => p.ProductNumber == productNumber).ToList();
+            _shownProducts = _allProducts.Where(p => p.ProductNumber == productNumber && p.IsInAssortment).ToList();
             return;
         }
-        _shownProducts = _allProducts.Where(p => p.ProductName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+        _shownProducts = _allProducts.Where(p => p.ProductName.Contains(_searchString, StringComparison.OrdinalIgnoreCase) && p.IsInAssortment).ToList();
     }
 }

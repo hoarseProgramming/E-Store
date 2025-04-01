@@ -1,0 +1,107 @@
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@using EStore.Application.Mapping
+@using System.Net.Http.Headers
+@inject IHttpClientFactory Factory
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<MudDialog>
+	<TitleContent>
+		Create product
+	</TitleContent>
+	<DialogContent>
+		@if (!_loading)
+		{
+			<MudPaper Height="100%" Width="100%" Class="d-flex justify-center align-center">
+				<MudForm @bind-IsValid="@_success">
+					<MudTextField @bind-value="Product.ProductNumber" T="int" Label="Product number" />
+					<MudTextField @bind-Value="Product.ProductName" T="string" Label="Product name" Required="true" RequiredError="Product name is required!" />
+					<MudTextField @bind-Value="Product.Description" T="string" Label="Description" Required="true" RequiredError="Description is required!" />
+					<MudTextField @bind-Value="Product.Price" T="double" Label="Price" Required="true" RequiredError="Price is required!" />
+					<MudSelect @bind-Value="Product.Category"
+					T="StoreCategory"
+					Variant="Variant.Outlined">
+						@if (Categories.Count > 0)
+						{
+							@foreach (var category in Categories)
+							{
+								<MudSelectItem Value="category">@category.CategoryName</MudSelectItem>
+							}
+						}
+					</MudSelect>
+					<MudCheckBox Label="Is in assortment" @bind-Value="Product.IsInAssortment"></MudCheckBox>
+				</MudForm>
+			</MudPaper>
+		}
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="Cancel">Cancel</MudButton>
+		<MudButton Color="Color.Primary" Disabled="@(!_success)" OnClick="Submit">Create Product</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+	[Parameter]
+	public List<StoreProduct> Products { get; set; }
+
+	[Parameter]
+	public StoreProduct Product { get; set; } = new()
+		{
+			ProductNumber = 0,
+			ProductName = "New Product",
+			Description = "Description",
+			Price = 0,
+			IsInAssortment = true,
+		};
+
+	public List<StoreCategory> Categories { get; set; } = [];
+
+	private HttpClient _httpClient;
+
+	private bool _loading;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_httpClient = Factory.CreateClient("backend");
+
+		var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+
+		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+		var response = await _httpClient.GetFromJsonAsync<CategoriesResponse>("api/categories");
+
+		if (response is not null)
+		{
+			Categories = response.MapToStoreCategories().ToList();
+
+			_loading = false;
+		}
+	}
+
+	private bool _success;
+
+	private async void Submit()
+	{
+		Product.CategoryId = Product.Category.Id;
+
+		var request = Product.MapToCreateProductRequest();
+
+		var result = await _httpClient.PostAsJsonAsync<CreateProductRequest>($"api/products", request);
+
+		if (result.IsSuccessStatusCode)
+		{
+			Products.Add(Product);
+			MudDialog.Close(DialogResult.Ok("Successfully created product"));
+		}
+
+		MudDialog.Close("Trouble while trying to save product");
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

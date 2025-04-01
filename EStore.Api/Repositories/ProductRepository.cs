@@ -14,7 +14,9 @@ public class ProductRepository(EStoreContext eStoreContext) : IProductRepository
 
     public async Task<Product?> GetByProductNumberAsync(int productNumber)
     {
-        var product = await eStoreContext.Products.SingleOrDefaultAsync(p => p.ProductNumber == productNumber);
+        var product = await eStoreContext.Products
+            .Include(p => p.Category)
+            .SingleOrDefaultAsync(p => p.ProductNumber == productNumber);
 
         return product;
     }

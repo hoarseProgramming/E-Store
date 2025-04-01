@@ -39,10 +39,6 @@ public class EStoreContext : IdentityDbContext<AuthUser>
             .IsRequired(false)
             .OnDelete(DeleteBehavior.SetNull);
 
-        //modelBuilder.Entity<Order>()
-        //    .HasOne<Customer>()
-        //    .WithMany(c => c.Orders)
-        //    .HasForeignKey(c => c.CustomerId);
 
         modelBuilder.Entity<Customer>()
             .HasMany(c => c.Orders)

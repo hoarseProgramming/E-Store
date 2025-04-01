@@ -1,28 +1,72 @@
-﻿@using EStore.Application.ApplicationModels
+﻿@page "/admin/products"
+@using EStore.Application.ApplicationModels
 @using EStore.Application.Mapping
 @using EStore.Contracts.Responses
-@page "/admin/products"
 @inject IHttpClientFactory Factory
+@inject IDialogService DialogService
 
-<MudGrid>
-	<MudItem xs="12">
-		<MudTable T="AppCustomer"
-			Items="Customers"
+
+<MudPaper Width="100%" Height="100%">
+	<MudGrid>
+		<MudItem xs="12">
+			<MudTable @ref="_table"
+			T="StoreProduct"
+			Filter="new Func<StoreProduct, bool>(FilterFunc1)"
+			Items="Products"
+			Hover="true"
 			Loading="_loading"
-			LoadingProgressColor="Color.Info">
+			LoadingProgressColor="Color.Info"
+			Class="overflow-scroll"
+			FixedHeader="true"
+			OnRowClick="RowClickEvent">
 
-			<LoadingContent>
-				<MudText>Loading</MudText>
-			</LoadingContent>
+				<ToolBarContent>
+					<MudTextField @ref="searchField" @bind-Value="_searchString" Immediate="true" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+					<MudSpacer />
+					<MudButton Variant="Variant.Outlined" @onclick="((e) => OpenCreateProductDialogAsync(Products))" StartIcon="@Icons.Material.Filled.AddBox" Color="Color.Primary">Add Product</MudButton>
+				</ToolBarContent>
 
-		</MudTable>
-	</MudItem>
-</MudGrid>
+				<HeaderContent>
+					<MudTh>#</MudTh>
+					<MudTh>Product name</MudTh>
+					<MudTh>Category</MudTh>
+					<MudTh>Price</MudTh>
+					<MudTh>Is in assortment</MudTh>
+				</HeaderContent>
+
+				<RowTemplate>
+					@if (!_loading)
+					{
+						<MudTd DataLabel="#">@context.ProductNumber</MudTd>
+						<MudTd DataLabel="Product name">@context.ProductName</MudTd>
+						<MudTd DataLabel="Category">@context.Category?.CategoryName</MudTd>
+						<MudTd DataLabel="Price">@context.Price</MudTd>
+						<MudTd DataLabel="Is in assortment">@(context.IsInAssortment ? "Yes" : "No")</MudTd>
+					}
+				</RowTemplate>
+				<LoadingContent>
+					<MudText>Loading</MudText>
+				</LoadingContent>
+			</MudTable>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="d-flex jusutify-center align-center">
+				@_productInfo
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
+
+</MudPaper>
 
 @code {
 	private HttpClient _httpClient;
 	private bool _loading;
-	public List<AppCustomer> Customers { get; set; } = new();
+	public List<StoreProduct> Products { get; set; } = new();
+
+	private MudTable<StoreProduct> _table;
+	private MudTextField<string> searchField;
+	private string _searchString;
+	private string _productInfo;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -30,9 +74,9 @@
 
 		try
 		{
-			var response = await _httpClient.GetFromJsonAsync<CustomersResponse>("api/customers");
+			var response = await _httpClient.GetFromJsonAsync<ProductsResponse>("api/products");
 
-			Customers = response.MapToAppCustomers().ToList();
+			Products = response.MapToStoreProducts().ToList();
 		}
 		catch (Exception e)
 		{
@@ -41,6 +85,69 @@
 		finally
 		{
 			_loading = false;
+		}
+	}
+
+	private bool FilterFunc1(StoreProduct product) => FilterFunc(product, _searchString);
+
+	private bool FilterFunc(StoreProduct product, string _searchString)
+	{
+		if (string.IsNullOrWhiteSpace(_searchString))
+			return true;
+		if (product.ProductName.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+			return true;
+		return false;
+	}
+
+	private async Task OpenCreateProductDialogAsync(List<StoreProduct> products)
+	{
+		var parameters = new DialogParameters<CreateProductDialog>
+		{
+			{ t => t.Products, products }
+		};
+
+		var options = new DialogOptions
+			{
+				CloseOnEscapeKey = true,
+				MaxWidth = MaxWidth.Medium
+			};
+
+		var dialog = await DialogService.ShowAsync<CreateProductDialog>("Add Product", parameters, options);
+
+		var result = await dialog.Result;
+
+		if (!result.Canceled)
+		{
+			_productInfo = result.Data.ToString();
+		}
+	}
+
+	private async Task RowClickEvent(TableRowClickEventArgs<StoreProduct> tableRowClickEventArgs)
+	{
+		await OpenUpdateProductDialogAsync(tableRowClickEventArgs.Item);
+	}
+
+	private async Task OpenUpdateProductDialogAsync(StoreProduct product)
+	{
+		var parameters = new DialogParameters<UpdateProductDialog>
+		{
+			{ t => t.UneditedProduct, product },
+			{ t => t.EditedProduct, product }
+		};
+
+		var options = new DialogOptions
+			{
+				CloseOnEscapeKey = true,
+				FullScreen = true
+			};
+
+		var dialog = await DialogService.ShowAsync<UpdateProductDialog>("User orders", parameters, options);
+
+		var result = await dialog.Result;
+
+		if (!dialog.Result.IsCanceled)
+		{
+			StateHasChanged();
 		}
 	}
 }
