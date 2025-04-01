@@ -126,9 +126,12 @@ public static class ContractMapping
         };
     }
 
-    public static IEnumerable<CategoryResponse> MapToResponse(this IEnumerable<Category> categories)
+    public static CategoriesResponse MapToResponse(this IEnumerable<Category> categories)
     {
-        return categories.Select(MapToResponse);
+        return new CategoriesResponse()
+        {
+            Categories = categories.Select(MapToResponse)
+        };
     }
 
     public static Order MapToOrder(this CreateOrderRequest request)

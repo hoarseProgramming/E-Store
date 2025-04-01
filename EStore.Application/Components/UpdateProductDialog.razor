@@ -1,0 +1,113 @@
+﻿@using EStore.Application.ApplicationModels
+@using EStore.Contracts.Requests
+@using EStore.Contracts.Responses
+@using EStore.Application.Mapping
+@using System.Net.Http.Headers
+@inject IHttpClientFactory Factory
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
+
+<MudDialog>
+	<TitleContent>
+		Update Product info
+	</TitleContent>
+	<DialogContent>
+		@if (!_loading)
+		{
+			<MudPaper Height="100%" Width="100%" Class="d-flex justify-center align-center">
+				<MudForm @bind-IsValid="@_success">
+					<MudTextField Value="EditedProduct.ProductNumber" ReadOnly="true" Disabled="true" T="int" Label="Product number" />
+					<MudTextField @bind-Value="EditedProduct.ProductName" T="string" Label="Product name" Required="true" RequiredError="Product name is required!" />
+					<MudTextField @bind-Value="EditedProduct.Description" T="string" Label="Description" Required="true" RequiredError="Description is required!" />
+					<MudTextField @bind-Value="EditedProduct.Price" T="double" Label="Price" Required="true" RequiredError="Price is required!" />
+					<MudSelect @bind-Value="EditedProduct.Category"
+							   T="StoreCategory"
+							   Variant="Variant.Outlined">
+						@if (Categories.Count > 0)
+						{
+							@foreach (var category in Categories)
+							{
+								<MudSelectItem Value="category">@category.CategoryName</MudSelectItem>
+							}
+						}
+					</MudSelect>
+					<MudCheckBox Label="Is in assortment" @bind-Value="EditedProduct.IsInAssortment"></MudCheckBox>
+				</MudForm>
+			</MudPaper>
+		}
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="Cancel">Cancel</MudButton>
+		<MudButton Color="Color.Primary" Disabled="@(!_success)" OnClick="Submit">Update Product</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+	[Parameter]
+	public StoreProduct UneditedProduct { get; set; }
+
+	[Parameter]
+	public StoreProduct EditedProduct { get; set; }
+
+	public List<StoreCategory> Categories { get; set; } = [];
+
+	private HttpClient _httpClient;
+
+	private bool _loading;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_httpClient = Factory.CreateClient("backend");
+
+		var response = await _httpClient.GetFromJsonAsync<CategoriesResponse>("api/categories");
+
+		if (response is not null)
+		{
+			Categories = response.MapToStoreCategories().ToList();
+			EditedProduct = new()
+				{
+					ProductNumber = UneditedProduct.ProductNumber,
+					ProductName = UneditedProduct.ProductName,
+					Description = UneditedProduct.Description,
+					CategoryId = UneditedProduct.CategoryId,
+					Category = UneditedProduct.Category,
+					Price = UneditedProduct.Price,
+					IsInAssortment = UneditedProduct.IsInAssortment,
+				};
+
+			_loading = false;
+		}
+	}
+
+	private bool _success;
+
+	private async void Submit()
+	{
+		var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+
+		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+		EditedProduct.CategoryId = EditedProduct.Category.Id;
+
+		var request = EditedProduct.MapToUpdateProductRequest();
+
+		var result = await _httpClient.PutAsJsonAsync<UpdateProductRequest>($"api/products/{request.ProductNumber}", request);
+
+		if (result.IsSuccessStatusCode)
+		{
+			UneditedProduct.ProductName = EditedProduct.ProductName;
+			UneditedProduct.Description = EditedProduct.Description;
+			UneditedProduct.IsInAssortment = EditedProduct.IsInAssortment;
+			UneditedProduct.Price = EditedProduct.Price;
+			UneditedProduct.Category = EditedProduct.Category;
+			UneditedProduct.CategoryId = EditedProduct.CategoryId;
+			MudDialog.Close(DialogResult.Ok("Successfully updated product"));
+		}
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}
