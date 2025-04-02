@@ -1,5 +1,4 @@
 ﻿using EStore.Api.Models;
-using EStore.Api.Repositories;
 using EStore.Api.UnitOfWork;
 
 namespace EStore.Api.Services;
@@ -7,17 +6,21 @@ namespace EStore.Api.Services;
 public class OrderService(IUnitOfWork unitOfWork) : IOrderService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    
+
     public async Task<bool> CreateAsync(Order order)
     {
         _unitOfWork.OrderRepository.Create(order);
 
-        // foreach (var orderProduct in orderProducts)
-        // {
-        //     _unitOfWork.OrderProductRepository.Create(orderProduct);
-        // }
+        int result = 0;
 
-        var result = await _unitOfWork.SaveChangesAsync();
+        try
+        {
+            result = await _unitOfWork.SaveChangesAsync();
+
+        }
+        catch (Exception)
+        {
+        }
 
         return result > 0;
     }
@@ -40,14 +43,14 @@ public class OrderService(IUnitOfWork unitOfWork) : IOrderService
     public async Task<bool> DeleteByIdAsync(Guid id)
     {
         var orderExists = await ExistsByIdAsync(id);
-        
+
         if (!orderExists)
         {
             return false;
         }
-        
+
         await _unitOfWork.OrderRepository.DeleteByIdAsync(id);
-        
+
         var result = await _unitOfWork.SaveChangesAsync();
 
         return result > 0;

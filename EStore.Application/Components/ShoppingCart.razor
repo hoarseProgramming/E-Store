@@ -2,6 +2,8 @@
 @using EStore.Application.Events
 @using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
+@using EStore.Application.Mapping
+@inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
 <MudPaper Height="100%" Width="100%">
@@ -9,23 +11,28 @@
 		ShoppingCart
 	</MudPaper>
 	<MudPaper Height="85%" Width="100%" Class="overflow-scroll">
-		<MudStack Spacing="0">
+		<MudGrid Spacing="1">
 			@foreach (var product in Products)
 			{
-				<ProductInCart Product="product"></ProductInCart>
+				<MudItem xs="12">
+					<ProductInCart Product="product"></ProductInCart>
+				</MudItem>
 			}
-		</MudStack>
+		</MudGrid>
 	</MudPaper>
 	<MudPaper Height="10%" Class="d-flex justify-center align-center">
-		<MudButton>Place order</MudButton>
+		<MudButton OnClick="PlaceOrder">Place order</MudButton>
 	</MudPaper>
 </MudPaper>
 
 @code {
 	public List<StoreProduct> Products { get; set; } = [];
+	private HttpClient _httpClient;
 
 	protected override async Task OnInitializedAsync()
 	{
+		_httpClient = Factory.CreateClient("backend");
+
 		CartPublisher.CartStateChanged += async () => await UpdateCartAsync();
 
 		var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
@@ -39,13 +46,35 @@
 			return;
 		}
 
-			Products = localStorageCart;
-			await base.OnInitializedAsync();
-		}
+		Products = localStorageCart;
+		await base.OnInitializedAsync();
+	}
 
 	private async Task UpdateCartAsync()
 	{
 		Products = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
 		StateHasChanged();
+	}
+
+	private async Task PlaceOrder()
+	{
+		var customerId = await LocalStorage.GetItemAsync<string>("CurrentCustomerId");
+
+		if (customerId is not null)
+		{
+			var request = new CreateOrderRequest()
+				{
+					CustomerId = Guid.Parse(customerId),
+					OrderProducts = Products.MapToRequest()
+				};
+
+			var response = await _httpClient.PostAsJsonAsync<CreateOrderRequest>("api/orders", request);
+
+			if (response.IsSuccessStatusCode)
+			{
+				Products.Clear();
+				await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", Products);
+			}
+		}
 	}
 }
