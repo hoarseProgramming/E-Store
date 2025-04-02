@@ -154,6 +154,13 @@
                 if (userInfo is not null)
                 {
                     await LocalStorage.SetItemAsync("CurrentUserId", userInfo.Id);
+
+                    var customerId = userInfo.CustomerId;
+
+                    if (customerId is not null)
+                    {
+                        await LocalStorage.SetItemAsync("CurrentCustomerId", customerId);
+                    }
                 }
 
                 await AuthPublisher.OnAuthenticationStateChanged();

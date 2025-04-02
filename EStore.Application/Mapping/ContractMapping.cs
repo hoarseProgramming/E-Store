@@ -25,6 +25,21 @@ namespace EStore.Application.Mapping
             return response.Products.Select(MapToStoreProduct);
         }
 
+
+        public static IEnumerable<CreateOrderProductRequest> MapToRequest(this IEnumerable<StoreProduct> products)
+        {
+            return products.Select(MapToCreateOrderProductRequest);
+        }
+
+        public static CreateOrderProductRequest MapToCreateOrderProductRequest(this StoreProduct product)
+        {
+            return new CreateOrderProductRequest()
+            {
+                ProductNumber = product.ProductNumber,
+                Quantity = product.Quantity
+            };
+        }
+
         public static CreateProductRequest MapToCreateProductRequest(this StoreProduct product)
         {
             return new CreateProductRequest()
