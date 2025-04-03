@@ -12,6 +12,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 {
     private readonly IProductService _productService = productService;
 
+    [Authorize(Roles = "ADMIN")]
     [HttpPost(ApiEndpoints.Products.Create)]
     public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {

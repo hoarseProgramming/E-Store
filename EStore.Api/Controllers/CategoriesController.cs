@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EStore.Api.Controllers;
 
-[Authorize]
+
 [ApiController]
 public class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
     private readonly ICategoryService _categoryService = categoryService;
 
+    [Authorize(Roles = "ADMIN")]
     [HttpPost(ApiEndpoints.Categories.Create)]
     public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
     {

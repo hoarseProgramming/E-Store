@@ -39,9 +39,6 @@ public static class CustomIdentityApiEndpointRouteBuilderExtensions
         var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
 
-        // We'll figure out a unique endpoint name based on the final route pattern during endpoint generation.
-        string? confirmEmailEndpointName = null;
-
         var routeGroup = endpoints.MapGroup("");
 
         // NOTE: We cannot inject UserManager<TUser> directly because the TUser generic parameter is currently unsupported by RDG.

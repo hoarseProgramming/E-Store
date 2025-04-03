@@ -48,10 +48,10 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
 
             var result = await userService.UpdateAsync(user);
 
-            return result ? Ok() : BadRequest();
+            return result ? Ok() : BadRequest(new { message = $"Couldn't set customer Id." });
         }
 
-        return NotFound();
+        return NotFound(new { message = "User not found" });
     }
 
     [HttpPut(ApiEndpoints.Auth.UpdateUserAndCustomer)]
@@ -61,7 +61,7 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
 
         if (user is null)
         {
-            return NotFound(new { message = $"Customer not found." });
+            return NotFound(new { message = "User not found." });
         }
 
         if (user.CustomerId is null)
@@ -93,6 +93,6 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
 
         var customerIsUpdated = await customerService.UpdateAsync(customer);
 
-        return customerIsUpdated ? Ok() : NotFound();
+        return customerIsUpdated ? Ok() : NotFound(new { message = "User not found." });
     }
 }
