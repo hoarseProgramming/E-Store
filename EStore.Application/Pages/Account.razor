@@ -175,6 +175,8 @@
     private async Task LogoutAsync()
     {
         await LocalStorage.RemoveItemAsync("eStoreToken");
+        await LocalStorage.RemoveItemAsync("CurrentCustomerId");
+        await LocalStorage.RemoveItemAsync("CurrentUserId");
         await AuthPublisher.OnAuthenticationStateChanged();
     }
 }

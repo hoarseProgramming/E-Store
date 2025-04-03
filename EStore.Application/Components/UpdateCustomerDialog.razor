@@ -2,6 +2,7 @@
 @using EStore.Application.ApplicationModels
 @using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
+@using System.Net.Http.Headers
 @inject IDialogService DialogService
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
@@ -62,6 +63,9 @@
     {
         _httpClient = Factory.CreateClient("backend");
 
+        var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
         await base.OnInitializedAsync();
     }
 
@@ -86,8 +90,6 @@
         {
             MudDialog.Close(DialogResult.Ok(new LoginInfo { Email = _email.Value, Password = _password.Value}));
         }
-        //Todo:
-        //Show that it didn't work
     }
 
     private void Cancel() => MudDialog.Cancel();

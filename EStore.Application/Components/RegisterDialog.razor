@@ -1,6 +1,9 @@
 ﻿@using System.ComponentModel.DataAnnotations
+@using EStore.Application.Dtos
+@using EStore.Application.Events
 @using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
+@using System.Net.Http.Headers
 @inject IDialogService DialogService
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
@@ -70,6 +73,8 @@
 
         if (accountResult.IsSuccessStatusCode)
         {
+            await LoginAsync();
+
             var createCustomerRequest = new CreateCustomerRequest()
                 {
                     FirstName = _firstName.Value,
@@ -80,6 +85,9 @@
                     City = _city.Value,
                     Country = _country.Value
                 };
+
+            var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var customerResult = await _httpClient.PostAsJsonAsync<CreateCustomerRequest>("api/customers", createCustomerRequest);
             var customer = await customerResult.Content.ReadFromJsonAsync<CustomerResponse>();
@@ -96,6 +104,48 @@
         }
 
         _accountInfo = accountResult.IsSuccessStatusCode ? "Registration successful" : "Didn't work";
+    }
+
+    private async Task LoginAsync()
+    {
+        var result = await _httpClient.PostAsJsonAsync("api/user/login", new
+        {
+            email = _email.Value,
+            password = _password.Value
+        });
+
+        if (result.IsSuccessStatusCode)
+        {
+            var token = await result.Content.ReadFromJsonAsync<LoginResponse>();
+
+            if (token is not null)
+            {
+                await LocalStorage.SetItemAsync("eStoreToken", token.AccessToken);
+                _accountInfo = "Login successful";
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+
+                var userInfo = await _httpClient.GetFromJsonAsync<UserInfoResponse>("api/user/info");
+
+                if (userInfo is not null)
+                {
+                    await LocalStorage.SetItemAsync("CurrentUserId", userInfo.Id);
+
+                    var customerId = userInfo.CustomerId;
+
+                    if (customerId is not null)
+                    {
+                        await LocalStorage.SetItemAsync("CurrentCustomerId", customerId);
+                    }
+                }
+
+                await AuthPublisher.OnAuthenticationStateChanged();
+            }
+        }
+        else
+        {
+            _accountInfo = "Didn't work";
+        }
     }
 
     private void Cancel() => MudDialog.Cancel();

@@ -2,12 +2,14 @@
 using EStore.Api.Services;
 using EStore.Contracts.Requests;
 using EStore.Contracts.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace EStore.Api.Controllers;
 
+[Authorize]
 public class UsersController(UserManager<AuthUser> userManager, IUserService userService, ICustomerService customerService) : ControllerBase
 {
     [HttpGet(ApiEndpoints.Auth.Get)]
@@ -55,17 +57,16 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
     [HttpPut(ApiEndpoints.Auth.UpdateUserAndCustomer)]
     public async Task<IActionResult> UpdateUserAndCustomer([FromBody] UpdateUserAndCustomerRequest request, [FromRoute] Guid id)
     {
-        //Skicka med Id med route?
         AuthUser? user = (AuthUser?)await userManager.FindByIdAsync(id.ToString());
 
         if (user is null)
         {
-            return NotFound();
+            return NotFound(new { message = $"Customer not found." });
         }
 
         if (user.CustomerId is null)
         {
-            return BadRequest();
+            return BadRequest(new { message = "Couldn't update info" });
         }
 
         user.UserName = request.Email;
@@ -75,7 +76,7 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
 
         if (!userIsUpdated)
         {
-            return BadRequest();
+            return BadRequest(new { message = "Couldn't update info" });
         }
 
         var customer = new Customer()
@@ -94,29 +95,4 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
 
         return customerIsUpdated ? Ok() : NotFound();
     }
-    //TODO: Remove
-    //[HttpGet(ApiEndpoints.Auth.RegisterAdmin)]
-    //public async Task<IActionResult> RegisterAsAdmin()
-    //{
-    //    var user = new AuthUser() { UserName = "TestAdmin", Email = "test@admin.com" };
-    //    var result = await userManager.CreateAsync(user, "TestAdmin123!");
-
-    //    if (!result.Succeeded)
-    //    {
-    //        return BadRequest(new { message = "Could not create user for whatever reason" });
-    //    }
-
-    //    var roleExists = await roleManager.RoleExistsAsync("ADMIN");
-
-    //    if (!roleExists)
-    //    {
-    //        await roleManager.CreateAsync(new IdentityRole("ADMIN"));
-    //    }
-
-    //    await userManager.AddToRoleAsync(user, "ADMIN");
-
-    //    await eStoreContext.SaveChangesAsync();
-
-    //    return Ok();
-    //}
 }
