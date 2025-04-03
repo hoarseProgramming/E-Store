@@ -1,11 +1,12 @@
 ﻿using EStore.Api.Mapping;
 using EStore.Api.Services;
 using EStore.Contracts.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EStore.Api.Controllers;
 
-
+[Authorize]
 [ApiController]
 public class CustomersController(ICustomerService customerService) : ControllerBase
 {
@@ -16,7 +17,12 @@ public class CustomersController(ICustomerService customerService) : ControllerB
     {
         var customer = request.MapToCustomer();
 
-        await _customerService.CreateAsync(customer);
+        var created = await _customerService.CreateAsync(customer);
+
+        if (!created)
+        {
+            return BadRequest(new { message = $"Customer with email {customer.Email} already exists." });
+        }
 
         var response = customer.MapToResponse();
 
@@ -31,7 +37,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
 
         if (customer is null)
         {
-            return NotFound();
+            return NotFound(new { message = $"Customer with id {id} not found." });
         }
 
         var response = customer.MapToResponse();
@@ -39,6 +45,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
         return Ok(response);
     }
 
+    [Authorize(Roles = "ADMIN")]
     [HttpGet(ApiEndpoints.Customers.GetAll)]
     public async Task<IActionResult> GetAll()
     {
@@ -59,7 +66,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
 
         if (!updated)
         {
-            return NotFound();
+            return NotFound(new { message = $"Customer with id {id} not found." });
         }
 
         var response = customer.MapToResponse();
@@ -67,6 +74,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
         return Ok(response);
     }
 
+    [Authorize(Roles = "ADMIN")]
     [HttpDelete(ApiEndpoints.Customers.Delete)]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
@@ -74,7 +82,7 @@ public class CustomersController(ICustomerService customerService) : ControllerB
 
         if (!deleted)
         {
-            return NotFound();
+            return NotFound(new { message = $"Customer with id {id} not found." });
         }
 
         return Ok();

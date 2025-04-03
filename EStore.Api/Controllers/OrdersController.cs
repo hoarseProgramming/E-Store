@@ -1,10 +1,12 @@
 ﻿using EStore.Api.Mapping;
 using EStore.Api.Services;
 using EStore.Contracts.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EStore.Api.Controllers;
-
+[Authorize]
+[ApiController]
 public class OrdersController(IOrderService orderService) : ControllerBase
 {
     [HttpPost(ApiEndpoints.Orders.Create)]
@@ -18,9 +20,9 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         {
             return BadRequest(new { message = "Couldn't create order" });
         }
-        
+
         var response = order.MapToResponse();
-        
+
         return CreatedAtAction(nameof(Get), new { Id = response.Id }, response);
     }
 
@@ -31,7 +33,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
 
         if (order is null)
         {
-            return NotFound();
+            return NotFound(new { message = $"Order with id {id} not found." });
         }
 
         var response = order.MapToResponse();
@@ -39,6 +41,7 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         return Ok(response);
     }
 
+    [Authorize(Roles = "ADMIN")]
     [HttpGet(ApiEndpoints.Orders.GetAll)]
     public async Task<IActionResult> GetAll()
     {
@@ -47,18 +50,5 @@ public class OrdersController(IOrderService orderService) : ControllerBase
         var response = orders.MapToResponse();
 
         return Ok(response);
-    }
-
-    [HttpDelete(ApiEndpoints.Orders.Delete)]
-    public async Task<IActionResult> Delete([FromRoute]Guid id)
-    {
-        var deleted = await orderService.DeleteByIdAsync(id);
-
-        if (!deleted)
-        {
-            return BadRequest(new { message = "Couldn't delete order" });
-        }
-
-        return Ok();
     }
 }

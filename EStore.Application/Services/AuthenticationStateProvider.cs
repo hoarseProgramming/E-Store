@@ -21,7 +21,7 @@ public class AuthenticationStateProvider : IAuthenticationStateProvider
     {
         var token = await _localStorage.GetItemAsync<string>("eStoreToken");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var result = await _httpClient.GetAsync("api/user/manage/info");
+        var result = await _httpClient.GetAsync("api/user/info");
 
         return result.IsSuccessStatusCode;
     }

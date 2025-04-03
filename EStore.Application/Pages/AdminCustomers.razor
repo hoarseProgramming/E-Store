@@ -2,8 +2,10 @@
 @using EStore.Application.ApplicationModels
 @using EStore.Application.Mapping
 @using EStore.Contracts.Responses
+@using System.Net.Http.Headers
 @inject IHttpClientFactory Factory
 @inject IDialogService DialogService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 
 <MudPaper Width="100%" Height="100%">
@@ -53,6 +55,9 @@
 	protected override async Task OnInitializedAsync()
 	{
 		_httpClient = Factory.CreateClient("backend");
+
+		var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+		_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 		try
 		{

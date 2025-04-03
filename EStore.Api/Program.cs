@@ -1,4 +1,5 @@
 using EStore.Api.Database;
+using EStore.Api.Endpoints;
 using EStore.Api.Models;
 using EStore.Api.Repositories;
 using EStore.Api.Services;
@@ -8,10 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -38,17 +37,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("ADMIN"));
 });
 
-//builder.Services.AddIdentityCore<IdentityUser>()
-//    .AddRoles<IdentityRole>()
-//    .AddEntityFrameworkStores<EStoreContext>()
-//    .AddDefaultTokenProviders();
-
 builder.Services.AddIdentityCore<AuthUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<EStoreContext>()
     .AddDefaultTokenProviders();
-
-//builder.Services.AddIdentityApiEndpoints<IdentityUser>();
 
 builder.Services.AddIdentityApiEndpoints<AuthUser>();
 
@@ -72,7 +64,6 @@ var app = builder.Build();
 
 app.UseCors("frontendPolicy");
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -84,11 +75,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.MapGroup("/api")
-//    .MapIdentityApi<IdentityUser>();
-
 app.MapGroup("/api/user")
-    .MapIdentityApi<AuthUser>();
+    .CustomMapIdentityApi<AuthUser>();
 
 app.MapControllers();
 

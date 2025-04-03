@@ -1,5 +1,4 @@
 ﻿using EStore.Api.Mapping;
-using EStore.Api.Repositories;
 using EStore.Api.Services;
 using EStore.Contracts.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -13,8 +12,9 @@ public class ProductsController(IProductService productService) : ControllerBase
 {
     private readonly IProductService _productService = productService;
 
+    [Authorize(Roles = "ADMIN")]
     [HttpPost(ApiEndpoints.Products.Create)]
-    public async Task<IActionResult> Create([FromBody]CreateProductRequest request)
+    public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {
         var product = request.MapToProduct();
 
@@ -22,9 +22,9 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         if (!created)
         {
-            return BadRequest();
+            return BadRequest(new { message = "Couldn't create Product" });
         }
-        
+
         var response = product.MapToResponse();
 
         return CreatedAtAction(nameof(Get), new { productNumber = product.ProductNumber }, response);
@@ -38,11 +38,11 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         if (product is null)
         {
-            return NotFound();
+            return NotFound(new { message = $"Product with number {productNumber} not found." });
         }
 
         var response = product.MapToResponse();
-        
+
         return Ok(response);
     }
 
@@ -57,9 +57,10 @@ public class ProductsController(IProductService productService) : ControllerBase
         return Ok(response);
     }
 
+    [Authorize(Roles = "ADMIN")]
     [HttpPut(ApiEndpoints.Products.Update)]
-    public async Task<IActionResult> Update([FromRoute]int productNumber,
-        [FromBody]UpdateProductRequest request)
+    public async Task<IActionResult> Update([FromRoute] int productNumber,
+        [FromBody] UpdateProductRequest request)
     {
         var product = request.MapToProduct(productNumber);
 
@@ -67,25 +68,11 @@ public class ProductsController(IProductService productService) : ControllerBase
 
         if (!updated)
         {
-            return NotFound();
+            return NotFound(new { message = $"Product with number {productNumber} not found." });
         }
 
         var response = product.MapToResponse();
 
         return Ok(response);
-    }
-
-    [Authorize(Roles = "ADMIN")]
-    [HttpDelete(ApiEndpoints.Products.Delete)]
-    public async Task<IActionResult> Delete([FromRoute] int productNumber)
-    {
-        var deleted = await _productService.DeleteByProductNumberAsync(productNumber);
-
-        if (!deleted)
-        {
-            return NotFound();
-        }
-
-        return Ok();
     }
 }

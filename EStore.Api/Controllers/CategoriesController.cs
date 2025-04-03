@@ -1,16 +1,18 @@
 ﻿using EStore.Api.Mapping;
-using EStore.Api.Repositories;
 using EStore.Api.Services;
 using EStore.Contracts.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EStore.Api.Controllers;
+
 
 [ApiController]
 public class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
     private readonly ICategoryService _categoryService = categoryService;
 
+    [Authorize(Roles = "ADMIN")]
     [HttpPost(ApiEndpoints.Categories.Create)]
     public async Task<IActionResult> Create([FromBody] CreateCategoryRequest request)
     {
@@ -28,11 +30,12 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         return CreatedAtAction(nameof(Get), new { Id = category.Id }, response);
     }
 
+    [AllowAnonymous]
     [HttpGet(ApiEndpoints.Categories.Get)]
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
         var category = await _categoryService.GetByIdAsync(id);
-        
+
         if (category is null)
         {
             return NotFound(new { message = $"Category with id {id} not found." });
@@ -43,6 +46,7 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpGet(ApiEndpoints.Categories.GetAll)]
     public async Task<IActionResult> GetAll()
     {
@@ -51,18 +55,5 @@ public class CategoriesController(ICategoryService categoryService) : Controller
         var response = categories.MapToResponse();
 
         return Ok(response);
-    }
-
-    [HttpDelete(ApiEndpoints.Categories.Delete)]
-    public async Task<IActionResult> Delete([FromRoute] Guid id)
-    {
-        var deleted = await _categoryService.DeleteAsync(id);
-
-        if (!deleted)
-        {
-            return NotFound(new { message = $"Category with name {id} not found." });
-        }
-
-        return Ok(new { message = $"Category with id {id} deleted succesfully"});
     }
 }

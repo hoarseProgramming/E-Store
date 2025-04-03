@@ -3,6 +3,8 @@
 @using EStore.Contracts.Requests
 @using EStore.Contracts.Responses
 @using EStore.Application.Mapping
+@using System.Net.Http.Headers
+@inject NavigationManager NavigationManager
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
@@ -62,6 +64,9 @@
 
 		if (customerId is not null)
 		{
+			var token = await LocalStorage.GetItemAsync<string>("eStoreToken");
+			_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
 			var request = new CreateOrderRequest()
 				{
 					CustomerId = Guid.Parse(customerId),
@@ -75,6 +80,10 @@
 				Products.Clear();
 				await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", Products);
 			}
+		}
+		else
+		{
+			NavigationManager.NavigateTo("Account");
 		}
 	}
 }
