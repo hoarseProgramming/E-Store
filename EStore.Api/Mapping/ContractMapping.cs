@@ -14,6 +14,7 @@ public static class ContractMapping
             ProductName = request.ProductName,
             Description = request.Description,
             Price = request.Price,
+            ImageUrl = request.ImageUrl,
             CategoryId = request.CategoryId,
             IsInAssortment = request.IsInAssortment
         };
@@ -27,6 +28,7 @@ public static class ContractMapping
             ProductName = request.ProductName,
             Description = request.Description,
             Price = request.Price,
+            ImageUrl = request.ImageUrl,
             CategoryId = request.CategoryId,
             IsInAssortment = request.IsInAssortment
         };
@@ -40,6 +42,7 @@ public static class ContractMapping
             ProductName = product.ProductName,
             Description = product.Description,
             Price = product.Price,
+            ImageUrl = product.ImageUrl,
             CategoryId = product.CategoryId,
             Category = product.Category?.MapToResponse(),
             IsInAssortment = product.IsInAssortment

@@ -2,22 +2,36 @@
 @using EStore.Application.Events
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
-<MudItem Class="border-solid border-2 mud-border-primary mud-width-full">
-	<MudGrid>
+<div class="border-solid border-2 mud-border-primary ma-1">
+	<MudGrid Spacing="2">
 		<MudItem xs="12">
-			<MudPaper Class="d-flex align-center justify-center mud-width-full">@Product.ProductName</MudPaper>
+			<div class="d-flex align-center justify-center mud-width-full px-1 ps-1">
+				<MudText>
+					@Product.ProductName
+				</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<div class="d-flex justify-center">
+				<MudImage Class="rounded-lg" Height="80" Width="80" Src="@Product.ImageUrl" FallbackSrc="Media/Images/no-image.png"></MudImage>
+			</div>
 		</MudItem>
 		<MudItem xs="4">
-			<MudIconButton Class="d-flex align-center justify-center mud-width-full" Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" OnClick="@((e) => AddProduct())" />
+			<div class="d-flex justify-center">
+				<MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Add" Color="Color.Inherit" OnClick="@((e) => AddProduct())" />
+			</div>
 		</MudItem>
 		<MudItem xs="4">
 			<MudPaper Class="d-flex align-center justify-center mud-width-full">@Product.Quantity</MudPaper>
 		</MudItem>
 		<MudItem xs="4">
-			<MudIconButton Class="d-flex align-center justify-center mud-width-full" Icon="@Icons.Material.Filled.Remove" Color="Color.Inherit" OnClick="@((e) => RemoveProduct())" />
+			<div class="d-flex justify-center">
+				<MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Inherit" OnClick="@((e) => RemoveProduct())" />
+			</div>
 		</MudItem>
 	</MudGrid>
-</MudItem>
+
+</div>
 
 @code {
 	[Parameter]
