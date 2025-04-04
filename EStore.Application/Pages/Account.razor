@@ -40,20 +40,18 @@
             </MudItem>
         </MudGrid>
     </MudForm>
-    <p>@_accountInfo</p>
 </MudPaper>
 
 @code
 {
     private bool _isAuthenticated;
     private bool _success;
+    private bool _shouldShowLoginMessage;
 
     private HttpClient _httpClient;
 
     private MudTextField<string> _email;
     private MudTextField<string> _password;
-
-    private string _accountInfo = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,11 +81,6 @@
         var dialog = await DialogService.ShowAsync<RegisterDialog>("Register", options);
 
         var result = await dialog.Result;
-
-        if (!result.Canceled)
-        {
-            _accountInfo = (string)result.Data;
-        }
     }
 
     private async Task OpenUpdateCustomerDialogAsync()
@@ -99,7 +92,7 @@
 
         if (userInfo.CustomerId is null)
         {
-            _accountInfo = "Not able to update admin info";
+            Snackbar.Add("Can't update Admin info", Severity.Error);
             return;
         }
 
@@ -125,8 +118,10 @@
         {
             _email.Value = loginInfo.Email;
             _password.Value = loginInfo.Password;
+            _shouldShowLoginMessage = true;
             await LoginAsync();
-            _accountInfo = "Success";
+            _shouldShowLoginMessage = false;
+            Snackbar.Add("Updated user info", Severity.Success);
             StateHasChanged();
         }
     }
@@ -145,7 +140,6 @@
             if (token is not null)
             {
                 await LocalStorage.SetItemAsync("eStoreToken", token.AccessToken);
-                _accountInfo = "Login successful";
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
@@ -161,6 +155,10 @@
                     {
                         await LocalStorage.SetItemAsync("CurrentCustomerId", customerId);
                     }
+                    if (_shouldShowLoginMessage)
+                    {
+                        Snackbar.Add("Logged in!", Severity.Success);
+                    }
                 }
 
                 await AuthPublisher.OnAuthenticationStateChanged();
@@ -168,7 +166,7 @@
         }
         else
         {
-            _accountInfo = "Didn't work";
+            Snackbar.Add("Login failed.", Severity.Error);
         }
     }
 

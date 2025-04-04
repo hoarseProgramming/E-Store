@@ -20,25 +20,32 @@
         <MudButton StartIcon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Href="/account">Account</MudButton>
         <AuthorizeVisible AllowedRole="ADMIN">
             <MudMenu Dense
-                AnchorOrigin="Origin.CenterCenter"
-                 Variant="Variant.Text"
-                 Size="Size.Medium"
-                 Color="Color.Inherit"
-                 Label="Admin"
-                 Icon="@Icons.Material.Filled.AdminPanelSettings">
-                    <MudMenuItem Href="/admin/customers"
-                                 Icon="@Icons.Material.Filled.ManageAccounts" 
-                                 Label="Manage customers" />
-                    <MudMenuItem Href="/admin/products"
-                                 Icon="@Icons.Material.Filled.AddChart"
-                                 Label="Manage products" />
+            AnchorOrigin="Origin.CenterCenter"
+            Variant="Variant.Text"
+            Size="Size.Medium"
+            Color="Color.Inherit"
+            Label="Admin"
+            Icon="@Icons.Material.Filled.AdminPanelSettings">
+                <MudMenuItem Href="/admin/customers"
+                Icon="@Icons.Material.Filled.ManageAccounts" 
+                Label="Manage customers" />
+                <MudMenuItem Href="/admin/products"
+                Icon="@Icons.Material.Filled.AddChart"
+                Label="Manage products" />
             </MudMenu>
         </AuthorizeVisible>
-        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" />
+        <MudButton StartIcon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())">
+            @if (_shoppingCartNumberVisible)
+            {
+                <MudText>
+                    (@Globals.ProductsInCart)
+                </MudText>
+            }
+        </MudButton>
 
     </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen" Anchor="Anchor.End">
-        <ShoppingCart/>
+    <MudDrawer @bind-Open="@Globals.ShoppingCartOpen" Anchor="Anchor.End">
+        <ShoppingCart />
     </MudDrawer>
     <MudMainContent>
         @Body
@@ -46,11 +53,21 @@
 </MudLayout>
 
 @code {
-    bool _drawerOpen = false;
+    private bool _shoppingCartNumberVisible;
+    protected override void OnInitialized()
+    {
+        CartPublisher.MainLayoutCartChanged += UpdateCart;
+    }
 
     void DrawerToggle()
     {
-        _drawerOpen = !_drawerOpen;
+        Globals.ShoppingCartOpen = !Globals.ShoppingCartOpen;
+    }
+
+    void UpdateCart()
+    {
+        _shoppingCartNumberVisible = Globals.ProductsInCart > 0;
+        StateHasChanged();
     }
 
 }
