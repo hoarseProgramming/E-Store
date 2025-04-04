@@ -24,6 +24,11 @@ public class UsersController(UserManager<AuthUser> userManager, IUserService use
 
             AuthUser? authUser = (AuthUser?)await userManager.FindByNameAsync(user.Identity.Name);
 
+            if (authUser is null)
+            {
+                return Unauthorized();
+            }
+
             var response = new UserInfoResponse()
             {
                 Id = Guid.Parse(authUser.Id),
