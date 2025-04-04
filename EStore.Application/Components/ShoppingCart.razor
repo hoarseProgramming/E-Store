@@ -8,11 +8,11 @@
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
-<MudPaper Height="100%" Width="100%" Class="overflow-x-hidden">
+<MudPaper Height="100%" Width="100%">
 	<MudPaper Height="5%" Class="d-flex justify-center align-center mud-width-full pa-2">
-		Shopping Cart
+		Items in cart:
 	</MudPaper>
-	<MudPaper Height="85%" Width="100%" Class="overflow-scroll overflow-x-hidden">
+	<MudPaper Height="87%" Width="100%" Class="overflow-scroll overflow-x-hidden">
 		<MudGrid Spacing="1">
 			@foreach (var product in Products)
 			{
@@ -22,7 +22,7 @@
 			}
 		</MudGrid>
 	</MudPaper>
-	<MudPaper Height="10%" Class="d-flex justify-center align-center">
+	<MudPaper Height="8%" Class="d-flex justify-center align-center">
 		<MudButton OnClick="PlaceOrder">Place order</MudButton>
 	</MudPaper>
 </MudPaper>
@@ -87,7 +87,9 @@
 			{
 				Products.Clear();
 				await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", Products);
+				Globals.ProductsInCart = 0;
 				Snackbar.Add("Order placed!", Severity.Success);
+				await CartPublisher.OnMainLayoutCartChanged();
 				Globals.ShoppingCartOpen = false;
 			}
 		}

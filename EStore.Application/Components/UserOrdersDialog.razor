@@ -8,20 +8,19 @@
 	</TitleContent>
 	<DialogContent>
 		<MudTable T="OrderResponse"
-		Items="Customer.Orders"
-		Hover="true"
-		Class="overflow-scroll"
-		FixedHeader="true"
-		OnRowClick="RowClickEvent">
+					Items="Customer.Orders"
+					Hover="true"
+					Height="75vh"
+					FixedHeader="true"
+					OnRowClick="RowClickEvent">
 
 			<HeaderContent>
 				<MudTh>Id</MudTh>
 			</HeaderContent>
 			<RowTemplate>
-				<MudTd DataLabel="Thing">@context.Id</MudTd>
+				<MudTd DataLabel="Order Id">@context.Id</MudTd>
 			</RowTemplate>
 		</MudTable>
-
 	</DialogContent>
 	<DialogActions>
 		<MudButton OnClick="Close">Close</MudButton>

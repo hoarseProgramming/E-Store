@@ -19,6 +19,7 @@
 					<MudTextField @bind-Value="Product.ProductName" T="string" Label="Product name" Required="true" RequiredError="Product name is required!" />
 					<MudTextField @bind-Value="Product.Description" T="string" Label="Description" Required="true" RequiredError="Description is required!" />
 					<MudTextField @bind-Value="Product.Price" T="double" Label="Price" Required="true" RequiredError="Price is required!" />
+					<MudTextField @bind-Value="Product.ImageUrl" T="string" Label="Image url"/>
 					<MudSelect @bind-Value="Product.Category"
 					T="StoreCategory"
 					Variant="Variant.Outlined">
@@ -94,10 +95,10 @@
 		if (result.IsSuccessStatusCode)
 		{
 			Products.Add(Product);
-			MudDialog.Close(DialogResult.Ok("Successfully created product"));
+			Snackbar.Add("Product added", Severity.Success);
+			MudDialog.Close();
 		}
-
-		MudDialog.Close("Trouble while trying to save product");
+		Snackbar.Add("Couldn't add product", Severity.Error);
 	}
 
 	private void Cancel()
