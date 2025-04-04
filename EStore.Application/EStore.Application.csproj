@@ -31,4 +31,8 @@
     <ProjectReference Include="..\EStore.Contracts\EStore.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Media\Images\" />
+  </ItemGroup>
+
 </Project>
