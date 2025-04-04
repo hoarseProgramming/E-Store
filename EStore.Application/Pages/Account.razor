@@ -46,7 +46,7 @@
 {
     private bool _isAuthenticated;
     private bool _success;
-    private bool _shouldShowLoginMessage;
+    private bool _shouldShowLoginMessage = true;
 
     private HttpClient _httpClient;
 
@@ -118,9 +118,9 @@
         {
             _email.Value = loginInfo.Email;
             _password.Value = loginInfo.Password;
-            _shouldShowLoginMessage = true;
-            await LoginAsync();
             _shouldShowLoginMessage = false;
+            await LoginAsync();
+            _shouldShowLoginMessage = true;
             Snackbar.Add("Updated user info", Severity.Success);
             StateHasChanged();
         }

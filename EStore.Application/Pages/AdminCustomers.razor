@@ -8,14 +8,14 @@
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 
-<MudPaper Width="100%" Height="100%">
+
 	<MudTable T="AppCustomer"
 			  Filter="new Func<AppCustomer, bool>(FilterFunc1)"
 			  Items="Customers"
 			  Hover="true"
 			  Loading="_loading"
+			  Height="80vh"
 			  LoadingProgressColor="Color.Info"
-			  Class="overflow-scroll"
 			  FixedHeader="true"
 			  OnRowClick="RowClickEvent">
 
@@ -32,17 +32,16 @@
 		<RowTemplate>
 			@if (!_loading)
 			{
-				<MudTd DataLabel="Thing">@context.FirstName</MudTd>
-				<MudTd DataLabel="Quantity">@context.LastName</MudTd>
-				<MudTd DataLabel="Location">@context.Email</MudTd>
+				<MudTd DataLabel="FirstName">@context.FirstName</MudTd>
+				<MudTd DataLabel="LastName">@context.LastName</MudTd>
+				<MudTd DataLabel="Email">@context.Email</MudTd>
 			}
 		</RowTemplate>
 		<LoadingContent>
 			<MudText>Loading</MudText>
 		</LoadingContent>
-
 	</MudTable>
-</MudPaper>
+
 
 @code {
 	private HttpClient _httpClient;

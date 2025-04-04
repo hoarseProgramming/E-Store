@@ -8,15 +8,26 @@
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 <div Class="ms-2 mt-1 d-flex justify-center align-center">
     <MudTextField Immediate="true"
-                  Text="@_searchString" TextChanged="SearchAsync" Placeholder="Search for product name or number" Class="pa-1" T="string"></MudTextField>
+    Text="@_searchString" TextChanged="SearchAsync" Placeholder="Search for product name or number" Class="pa-1" T="string"></MudTextField>
 </div>
 <div style="height:80vh" class="overflow-y-scroll overflow-x-hidden">
     <MudGrid>
         @foreach (var product in _shownProducts)
         {
-            <MudItem Class="max-height:300px" xs="12" sm="6" md="4" lg="3" xl="2">
-                <ProductComponent Product="product"></ProductComponent>
-            </MudItem>
+            @if (_loading)
+            {
+                <MudItem xs="12">
+                    <div class="d-flex justify-center">
+                        <MudText Typo="Typo.h4"></MudText>
+                    </div>
+                </MudItem>
+            }
+            else
+            {
+                <MudItem Class="max-height:300px" xs="12" sm="6" md="4" lg="3" xl="2">
+                    <ProductComponent Product="product"></ProductComponent>
+                </MudItem>
+            }
         }
     </MudGrid>
 </div>
@@ -25,6 +36,7 @@
 
 
 @code {
+    private bool _loading;
     private string _searchString = string.Empty;
 
     private HttpClient _httpClient;
@@ -37,6 +49,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _loading = true;
         _httpClient = Factory.CreateClient("backend");
 
         var productsResponse = await _httpClient.GetFromJsonAsync<ProductsResponse>("api/products");
@@ -46,6 +59,7 @@
         {
             _allProducts = productsResponse.MapToStoreProducts().ToList();
             _shownProducts = _allProducts.Where(p => p.IsInAssortment).ToList();
+            _loading = false;
         }
 
         var localStorageCart = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");

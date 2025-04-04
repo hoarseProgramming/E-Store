@@ -19,9 +19,10 @@
 					<MudTextField @bind-Value="EditedProduct.ProductName" T="string" Label="Product name" Required="true" RequiredError="Product name is required!" />
 					<MudTextField @bind-Value="EditedProduct.Description" T="string" Label="Description" Required="true" RequiredError="Description is required!" />
 					<MudTextField @bind-Value="EditedProduct.Price" T="double" Label="Price" Required="true" RequiredError="Price is required!" />
+					<MudTextField @bind-Value="EditedProduct.ImageUrl" T="string" Label="Image url" />
 					<MudSelect @bind-Value="EditedProduct.Category"
-							   T="StoreCategory"
-							   Variant="Variant.Outlined">
+					T="StoreCategory"
+					Variant="Variant.Outlined">
 						@if (Categories.Count > 0)
 						{
 							@foreach (var category in Categories)
@@ -70,6 +71,7 @@
 					ProductNumber = UneditedProduct.ProductNumber,
 					ProductName = UneditedProduct.ProductName,
 					Description = UneditedProduct.Description,
+					ImageUrl = UneditedProduct.ImageUrl,
 					CategoryId = UneditedProduct.CategoryId,
 					Category = UneditedProduct.Category,
 					Price = UneditedProduct.Price,
@@ -100,9 +102,15 @@
 			UneditedProduct.Description = EditedProduct.Description;
 			UneditedProduct.IsInAssortment = EditedProduct.IsInAssortment;
 			UneditedProduct.Price = EditedProduct.Price;
+			UneditedProduct.ImageUrl = EditedProduct.ImageUrl;
 			UneditedProduct.Category = EditedProduct.Category;
 			UneditedProduct.CategoryId = EditedProduct.CategoryId;
-			MudDialog.Close(DialogResult.Ok("Successfully updated product"));
+			Snackbar.Add("Updated Product", Severity.Success);
+			MudDialog.Close();
+		}
+		else
+		{
+			Snackbar.Add("Couldn't update product", Severity.Error);
 		}
 	}
 
