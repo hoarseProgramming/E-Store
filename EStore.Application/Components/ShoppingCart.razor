@@ -8,11 +8,11 @@
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
-<MudPaper Height="100%" Width="100%">
+<MudPaper Height="100%" Width="100%" Class="overflow-x-hidden">
 	<MudPaper Height="5%" Class="d-flex justify-center align-center mud-width-full pa-2">
 		Shopping Cart
 	</MudPaper>
-	<MudPaper Height="85%" Width="100%" Class="overflow-scroll">
+	<MudPaper Height="85%" Width="100%" Class="overflow-scroll overflow-x-hidden">
 		<MudGrid Spacing="1">
 			@foreach (var product in Products)
 			{
