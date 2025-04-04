@@ -14,15 +14,17 @@
 
 <MudLayout>
     <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Home" Color="Color.Inherit" Edge="Edge.Start" Href="/" />
-        <MudIconButton Icon="@Icons.Material.Filled.ShoppingBasket" Color="Color.Inherit" Edge="Edge.Start" Href="/store" />
-        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Edge="Edge.Start" Href="/account" />
+        <MudButton StartIcon="@Icons.Material.Filled.Home" Color="Color.Inherit" Edge="Edge.Start" Href="/">Home</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.ShoppingBasket" Color="Color.Inherit" Edge="Edge.Start" Href="/store">Shop</MudButton>
+        <MudSpacer />
+        <MudButton StartIcon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Href="/account">Account</MudButton>
         <AuthorizeVisible AllowedRole="ADMIN">
             <MudMenu Dense
                 AnchorOrigin="Origin.CenterCenter"
                  Variant="Variant.Text"
                  Size="Size.Medium"
                  Color="Color.Inherit"
+                 Label="Admin"
                  Icon="@Icons.Material.Filled.AdminPanelSettings">
                     <MudMenuItem Href="/admin/customers"
                                  Icon="@Icons.Material.Filled.ManageAccounts" 
@@ -32,7 +34,7 @@
                                  Label="Manage products" />
             </MudMenu>
         </AuthorizeVisible>
-        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" Edge="Edge.End" OnClick="@((e) => DrawerToggle())" />
+        <MudIconButton Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" OnClick="@((e) => DrawerToggle())" />
 
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen" Anchor="Anchor.End">
