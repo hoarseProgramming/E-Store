@@ -6,28 +6,21 @@
 
 @inject IHttpClientFactory Factory;
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
-<MudGrid>
-    <MudItem xs="8">
-        <MudPaper Class="ms-2 mt-1 d-flex justify-center align-center">
-            <MudTextField 
-                Immediate="true"
-                Text="@_searchString" TextChanged="SearchAsync" Placeholder="Search for product name or number" Class="pa-1" T="string"></MudTextField>
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="4">
-        <MudPaper Height="100%" Class="me-2 ms-1 d-flex justify-center align-center">
-            Shop
-        </MudPaper>
-    </MudItem>
-    <MudItem xs="12">
-        <MudStack Class="mx-2" Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Start">
-            @foreach (var product in _shownProducts)
-            {
+<div Class="ms-2 mt-1 d-flex justify-center align-center">
+    <MudTextField Immediate="true"
+                  Text="@_searchString" TextChanged="SearchAsync" Placeholder="Search for product name or number" Class="pa-1" T="string"></MudTextField>
+</div>
+<div style="height:80vh" class="overflow-y-scroll overflow-x-hidden">
+    <MudGrid>
+        @foreach (var product in _shownProducts)
+        {
+            <MudItem Class="max-height:300px" xs="12" sm="6" md="4" lg="3" xl="2">
                 <ProductComponent Product="product"></ProductComponent>
-            }
-        </MudStack>
-    </MudItem>
-</MudGrid>
+            </MudItem>
+        }
+    </MudGrid>
+</div>
+
 
 
 

@@ -4,11 +4,32 @@
 @using EStore.Contracts.Responses
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage;
 
-<MudStack>
-	<h3>@Product.ProductName</h3>
-	<h3>@Product.Price :-</h3>
-	<MudButton Variant="Variant.Filled" OnClick="AddToCart">Add to cart</MudButton>
-</MudStack>
+<MudPaper Height="300px" Width="100%">
+	<div class="ma-2">
+		<MudGrid Spacing="1">
+			<MudItem xs="12">
+				<div class="d-flex justify-center">
+					<h3>@Product.ProductName</h3>
+				</div>
+			</MudItem>
+			<MudItem xs="12">
+				<div class="d-flex justify-center">
+					<MudImage Class="rounded-lg" Height="200" Width="200" Src="https://images.unsplash.com/photo-1706356104839-5d3a4e8eb35f?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"></MudImage>
+				</div>
+			</MudItem>
+			<MudItem xs="6">
+				<div class="d-flex justify-center">
+					<h3>@Product.Price :-</h3>
+				</div>
+			</MudItem>
+			<MudItem xs="6">
+				<div class="d-flex justify-center">
+					<MudButton Variant="Variant.Filled" OnClick="AddToCart">Add to cart</MudButton>
+				</div>
+			</MudItem>
+		</MudGrid>
+	</div>
+</MudPaper>
 
 @code {
 	[Parameter]

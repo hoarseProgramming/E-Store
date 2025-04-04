@@ -10,7 +10,7 @@
 
 <MudPaper Height="100%" Width="100%">
 	<MudPaper Height="5%" Class="d-flex justify-center align-center mud-width-full pa-2">
-		ShoppingCart
+		Shopping Cart
 	</MudPaper>
 	<MudPaper Height="85%" Width="100%" Class="overflow-scroll">
 		<MudGrid Spacing="1">
@@ -50,11 +50,19 @@
 
 		Products = localStorageCart;
 		await base.OnInitializedAsync();
+		await UpdateCartAsync();
 	}
 
 	private async Task UpdateCartAsync()
 	{
 		Products = await LocalStorage.GetItemAsync<List<StoreProduct>>("Cart");
+		var productsInCart = 0;
+		foreach (var product in Products)
+		{
+			productsInCart += product.Quantity;
+		}
+		Globals.ProductsInCart = productsInCart;
+		await CartPublisher.OnMainLayoutCartChanged();
 		StateHasChanged();
 	}
 
@@ -79,10 +87,14 @@
 			{
 				Products.Clear();
 				await LocalStorage.SetItemAsync<List<StoreProduct>>("Cart", Products);
+				Snackbar.Add("Order placed!", Severity.Success);
+				Globals.ShoppingCartOpen = false;
 			}
 		}
 		else
 		{
+			Snackbar.Add("Please login before placing order", Severity.Warning);
+			Globals.ShoppingCartOpen = false;
 			NavigationManager.NavigateTo("Account");
 		}
 	}

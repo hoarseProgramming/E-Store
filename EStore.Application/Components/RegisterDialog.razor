@@ -51,8 +51,6 @@
     private MudTextField<string> _country;
     private MudTextField<string> _password;
 
-    private string _accountInfo = "";
-
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; }
 
@@ -99,11 +97,14 @@
                 };
 
             var setCustomerResult = await _httpClient.PostAsJsonAsync<SetCustomerRequest>("api/user/set-customer", setCustomerRequest);
+            Snackbar.Add("Registered new user", Severity.Success);
 
-            MudDialog.Close(DialogResult.Ok("Registration successful"));
+            MudDialog.Close();
         }
-
-        _accountInfo = accountResult.IsSuccessStatusCode ? "Registration successful" : "Didn't work";
+        else
+        {
+            Snackbar.Add("Couldn't register", Severity.Error);
+        }
     }
 
     private async Task LoginAsync()
@@ -121,7 +122,6 @@
             if (token is not null)
             {
                 await LocalStorage.SetItemAsync("eStoreToken", token.AccessToken);
-                _accountInfo = "Login successful";
 
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
@@ -141,10 +141,6 @@
 
                 await AuthPublisher.OnAuthenticationStateChanged();
             }
-        }
-        else
-        {
-            _accountInfo = "Didn't work";
         }
     }
 
