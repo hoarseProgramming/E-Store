@@ -14,6 +14,7 @@ namespace EStore.Application.Mapping
                 ProductName = response.ProductName,
                 Description = response.Description,
                 Price = response.Price,
+                ImageUrl = response.ImageUrl is null ? "" : response.ImageUrl,
                 CategoryId = response.CategoryId,
                 Category = response.Category.MapToStoreCategory(),
                 IsInAssortment = response.IsInAssortment
@@ -48,6 +49,7 @@ namespace EStore.Application.Mapping
                 ProductName = product.ProductName,
                 Description = product.Description,
                 Price = product.Price,
+                ImageUrl = product.ImageUrl,
                 IsInAssortment = product.IsInAssortment,
                 CategoryId = product.CategoryId
             };
@@ -61,6 +63,7 @@ namespace EStore.Application.Mapping
                 ProductName = product.ProductName,
                 Description = product.Description,
                 Price = product.Price,
+                ImageUrl = product.ImageUrl,
                 IsInAssortment = product.IsInAssortment,
                 CategoryId = product.CategoryId
             };

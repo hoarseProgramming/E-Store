@@ -6,7 +6,7 @@
 
 <MudPaper Height="300px" Width="100%">
 	<div class="ma-2">
-		<MudGrid Spacing="1">
+		<MudGrid Spacing="2">
 			<MudItem xs="12">
 				<div class="d-flex justify-center">
 					<h3>@Product.ProductName</h3>
@@ -14,17 +14,17 @@
 			</MudItem>
 			<MudItem xs="12">
 				<div class="d-flex justify-center">
-					<MudImage Class="rounded-lg" Height="200" Width="200" Src="https://images.unsplash.com/photo-1706356104839-5d3a4e8eb35f?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"></MudImage>
+					<MudImage Class="rounded-lg" Height="200" Width="200" Src="@Product.ImageUrl" FallbackSrc="Media/Images/no-image.png"></MudImage>
 				</div>
 			</MudItem>
 			<MudItem xs="6">
-				<div class="d-flex justify-center">
+				<div class="d-flex justify-center align-center">
 					<h3>@Product.Price :-</h3>
 				</div>
 			</MudItem>
 			<MudItem xs="6">
-				<div class="d-flex justify-center">
-					<MudButton Variant="Variant.Filled" OnClick="AddToCart">Add to cart</MudButton>
+				<div class="d-flex justify-center align-center">
+					<MudButton Variant="Variant.Filled" OnClick="AddToCart">Buy</MudButton>
 				</div>
 			</MudItem>
 		</MudGrid>
