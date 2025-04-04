@@ -537,6 +537,7 @@ CreateOrderProductRequest:
 | productName   | string  | Yes      |
 | description   | string  | Yes      |
 | price        | number  | Yes      |
+| imageUrl        | string  | no      |
 | categoryId    | guid | No |
 | isInAssortment | boolean | Yes |
 
@@ -548,6 +549,7 @@ CreateOrderProductRequest:
   "ProductName": "Gaming Laptop",
   "Description": "High-performance laptop designed for gaming with a 16GB RAM and 1TB SSD.",
   "Price": 1499.99,
+  "ImageUrl": "www.image.com/image.jpg"
   "CategoryId": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
   "Category": {
     "Id": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
@@ -579,6 +581,7 @@ CreateOrderProductRequest:
       "ProductName": "Gaming Laptop",
       "Description": "High-performance laptop designed for gaming with a 16GB RAM and 1TB SSD.",
       "Price": 1499.99,
+      "ImageUrl": "www.image.com/image.jpg"
       "CategoryId": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
       "Category": {
         "Id": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
@@ -606,6 +609,7 @@ CreateOrderProductRequest:
     "ProductName": "Gaming Laptop",
     "Description": "High-performance laptop designed for gaming with a 16GB RAM and 1TB SSD.",
     "Price": 1499.99,
+    "ImageUrl": "www.image.com/image.jpg"
     "CategoryId": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
     "Category": {
     "Id": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
@@ -636,6 +640,7 @@ CreateOrderProductRequest:
 | productName   | string  | Yes      |
 | description   | string  | Yes      |
 | price        | number  | Yes      |
+| imageUrl        | string  | no      |
 | categoryId    | guid| No |
 | isInAssortment | boolean | Yes |
 
@@ -648,6 +653,7 @@ CreateOrderProductRequest:
     "ProductName": "Gaming Laptop",
     "Description": "High-performance laptop designed for gaming with a 16GB RAM and 1TB SSD.",
     "Price": 1499.99,
+    "ImageUrl": "www.image.com/image.jpg"
     "CategoryId": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
     "Category": {
     "Id": "9f4b43c3-1dfe-4d6e-9a6a-8f6e67b22c88",
